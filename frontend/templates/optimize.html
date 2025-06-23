@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}FSOC Link Optimization - Optimize Deployment{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h3>Optimize FSOC Link Deployment</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/optimize">
+                    <div class="row">
+                        <!-- Location Section -->
+                        <div class="col-md-6">
+                            <h4>Transmitter Location</h4>
+                            <div class="mb-3">
+                                <label for="lat_tx" class="form-label">Latitude (degrees)</label>
+                                <input type="number" step="0.0001" class="form-control" id="lat_tx" name="lat_tx" required min="-90" max="90" value="37.7749">
+                            </div>
+                            <div class="mb-3">
+                                <label for="lon_tx" class="form-label">Longitude (degrees)</label>
+                                <input type="number" step="0.0001" class="form-control" id="lon_tx" name="lon_tx" required min="-180" max="180" value="-122.4194">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h4>Receiver Location</h4>
+                            <div class="mb-3">
+                                <label for="lat_rx" class="form-label">Latitude (degrees)</label>
+                                <input type="number" step="0.0001" class="form-control" id="lat_rx" name="lat_rx" required min="-90" max="90" value="37.7849">
+                            </div>
+                            <div class="mb-3">
+                                <label for="lon_rx" class="form-label">Longitude (degrees)</label>
+                                <input type="number" step="0.0001" class="form-control" id="lon_rx" name="lon_rx" required min="-180" max="180" value="-122.4094">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <!-- Expected Conditions -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4>Expected Environmental Conditions</h4>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="avg_fog_density" class="form-label">Avg. Fog Density (g/m³)</label>
+                                <input type="number" step="0.1" class="form-control" id="avg_fog_density" name="avg_fog_density" min="0" max="5" value="0.1">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="avg_rain_rate" class="form-label">Avg. Rain Rate (mm/hr)</label>
+                                <input type="number" step="0.1" class="form-control" id="avg_rain_rate" name="avg_rain_rate" min="0" max="50" value="2.0">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="avg_surface_temp" class="form-label">Avg. Surface Temp (°C)</label>
+                                <input type="number" step="0.1" class="form-control" id="avg_surface_temp" name="avg_surface_temp" min="-20" max="60" value="25.0">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="avg_ambient_temp" class="form-label">Avg. Ambient Temp (°C)</label>
+                                <input type="number" step="0.1" class="form-control" id="avg_ambient_temp" name="avg_ambient_temp" min="-30" max="50" value="20.0">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <!-- Constraints -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4>Deployment Constraints</h4>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="min_height" class="form-label">Minimum Height (m)</label>
+                                <input type="number" step="0.1" class="form-control" id="min_height" name="min_height" min="1" max="100" value="5">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="max_height" class="form-label">Maximum Height (m)</label>
+                                <input type="number" step="0.1" class="form-control" id="max_height" name="max_height" min="10" max="1000" value="100">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label class="form-label">Available Materials</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="available_materials" value="white_paint" id="material_white_paint" checked>
+                                    <label class="form-check-label" for="material_white_paint">White Paint</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="available_materials" value="black_paint" id="material_black_paint">
+                                    <label class="form-check-label" for="material_black_paint">Black Paint</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="available_materials" value="aluminum" id="material_aluminum" checked>
+                                    <label class="form-check-label" for="material_aluminum">Aluminum</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="available_materials" value="steel" id="material_steel" checked>
+                                    <label class="form-check-label" for="material_steel">Steel</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="available_materials" value="concrete" id="material_concrete">
+                                    <label class="form-check-label" for="material_concrete">Concrete</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="available_materials" value="wood" id="material_wood">
+                                    <label class="form-check-label" for="material_wood">Wood</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <!-- Performance Requirements -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="min_received_power_dbm" class="form-label">Min. Received Power (dBm)</label>
+                                <input type="number" step="0.1" class="form-control" id="min_received_power_dbm" name="min_received_power_dbm" value="-30">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="reliability_target" class="form-label">Reliability Target</label>
+                                <input type="number" step="0.01" class="form-control" id="reliability_target" name="reliability_target" min="0.9" max="1.0" value="0.99">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="reset" class="btn btn-secondary">Reset</button>
+                        <button type="submit" class="btn btn-primary">Run Optimization</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

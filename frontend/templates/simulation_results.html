@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}FSOC Link Optimization - Simulation Results{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3>Simulation Results</h3>
+                <div>
+                    <a href="/simulate" class="btn btn-outline-primary">New Simulation</a>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if result.success %}
+                    <div class="alert alert-success">
+                        <strong>Success!</strong> Simulation completed in {{ "%.2f"|format(result.execution_time_seconds) }} seconds.
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h5>Link Summary</h5>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-striped">
+                                        <tbody>
+                                            <tr>
+                                                <th>Simulation ID</th>
+                                                <td>{{ result.simulation_id }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Timestamp</th>
+                                                <td>{{ result.timestamp }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Link Distance</th>
+                                                <td>{{ "%.2f"|format(result.results.link_distance_km) }} km</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Received Power</th>
+                                                <td>{{ "%.2f"|format(result.results.received_power_dbm) }} dBm</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Link Margin</th>
+                                                <td>{{ "%.2f"|format(result.results.link_margin_db) }} dB</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Link Status</th>
+                                                <td>
+                                                    {% if result.results.link_viable %}
+                                                        <span class="badge bg-success">Viable</span>
+                                                    {% else %}
+                                                        <span class="badge bg-danger">Not Viable</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h5>Loss Breakdown</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="loss-chart" class="visualization"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if result.results.detailed_results %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Detailed Layer Results</h5>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Layer</th>
+                                                <th>Loss (dB)</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for layer in result.results.detailed_results.layers %}
+                                            <tr>
+                                                <td>{{ layer.name }}</td>
+                                                <td>{{ "%.2f"|format(layer.loss_db) }}</td>
+                                                <td>{{ layer.description }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Raw Results</h5>
+                                </div>
+                                <div class="card-body">
+                                    <pre class="bg-light p-3 rounded"><code>{{ result.results | tojson(indent=2) }}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="alert alert-danger">
+                        <strong>Error:</strong> {{ result.error_message }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if result.success %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Extract loss data from results
+        const results = {{ result.results | tojson }};
+        
+        // Prepare data for loss breakdown chart
+        const lossTypes = [];
+        const lossValues = [];
+        
+        if (results.loss_breakdown) {
+            for (const [key, value] of Object.entries(results.loss_breakdown)) {
+                lossTypes.push(key.replace('_loss_db', '').replace(/_/g, ' '));
+                lossValues.push(value);
+            }
+        }
+        
+        // Create loss breakdown chart
+        const lossData = [{
+            x: lossTypes,
+            y: lossValues,
+            type: 'bar',
+            marker: {
+                color: 'rgba(50, 98, 235, 0.7)'
+            }
+        }];
+        
+        const lossLayout = {
+            title: 'Loss Contributions (dB)',
+            xaxis: {
+                title: 'Loss Type'
+            },
+            yaxis: {
+                title: 'Loss (dB)'
+            },
+            margin: {
+                l: 50,
+                r: 50,
+                b: 100,
+                t: 50,
+                pad: 4
+            }
+        };
+        
+        Plotly.newPlot('loss-chart', lossData, lossLayout);
+    });
+</script>
+{% endif %}
+{% endblock %}

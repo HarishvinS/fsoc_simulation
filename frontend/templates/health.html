@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}FSOC Link Optimization - System Health{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h3>System Health</h3>
+            </div>
+            <div class="card-body">
+                {% if error %}
+                    <div class="alert alert-danger">
+                        <strong>Error:</strong> {{ error }}
+                    </div>
+                    <p>The backend API may not be running. Please start the API server using:</p>
+                    <pre class="bg-light p-3 rounded"><code>python start_api.py</code></pre>
+                {% elif health %}
+                    <div class="alert alert-{{ 'success' if health.status == 'healthy' else 'warning' }}">
+                        <strong>Status:</strong> {{ health.status }}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h5>API Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-striped">
+                                        <tbody>
+                                            <tr>
+                                                <th>API Version</th>
+                                                <td>{{ health.api_version }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Timestamp</th>
+                                                <td>{{ health.timestamp }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Active Tasks</th>
+                                                <td>{{ health.system_info.active_tasks }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h5>Model Status</h5>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-striped">
+                                        <tbody>
+                                            {% for model_name, is_loaded in health.models_loaded.items() %}
+                                            <tr>
+                                                <th>{{ model_name }}</th>
+                                                <td>
+                                                    {% if is_loaded %}
+                                                        <span class="badge bg-success">Loaded</span>
+                                                    {% else %}
+                                                        <span class="badge bg-danger">Not Loaded</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>System Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <pre class="bg-light p-3 rounded"><code>{{ health.system_info | tojson(indent=2) }}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}FSOC Link Optimization - Home{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title">FSOC Link Optimization</h1>
+                <p class="card-text">
+                    Welcome to the Free Space Optical Communication (FSOC) Link Optimization tool. 
+                    This application helps you simulate and optimize FSOC links for various environmental conditions.
+                </p>
+                
+                {% if backend_status == False %}
+                <div class="alert alert-warning" role="alert">
+                    <strong>Warning:</strong> Cannot connect to backend API. Make sure the backend server is running.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Simulate Link</h5>
+            </div>
+            <div class="card-body">
+                <p>Run simulations to predict FSOC link performance under specific environmental conditions.</p>
+                <a href="/simulate" class="btn btn-primary">Start Simulation</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Optimize Deployment</h5>
+            </div>
+            <div class="card-body">
+                <p>Get recommendations for optimal deployment parameters based on your constraints.</p>
+                <a href="/optimize" class="btn btn-primary">Start Optimization</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Example Simulations</h5>
+            </div>
+            <div class="card-body">
+                <p>Run pre-configured example simulations to see how the system works:</p>
+                <div class="d-flex gap-2">
+                    <a href="/examples?type=urban" class="btn btn-primary">Urban Link Example</a>
+                    <a href="/examples?type=rural" class="btn btn-primary">Rural Link Example</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>System Health</h5>
+            </div>
+            <div class="card-body">
+                <p>Check the status of the backend API and model availability.</p>
+                <a href="/health" class="btn btn-outline-secondary">View System Health</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
