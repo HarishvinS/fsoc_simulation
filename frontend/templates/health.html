@@ -4,85 +4,247 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h3>System Health</h3>
+                <h3>
+                    <i class="bi bi-heart-pulse"></i>
+                    System Health Dashboard
+                </h3>
             </div>
             <div class="card-body">
                 {% if error %}
                     <div class="alert alert-danger">
-                        <strong>Error:</strong> {{ error }}
-                    </div>
-                    <p>The backend API may not be running. Please start the API server using:</p>
-                    <pre class="bg-light p-3 rounded"><code>python start_api.py</code></pre>
-                {% elif health %}
-                    <div class="alert alert-{{ 'success' if health.status == 'healthy' else 'warning' }}">
-                        <strong>Status:</strong> {{ health.status }}
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <strong>Connection Error:</strong> {{ error }}
                     </div>
                     
-                    <div class="row">
+                    <div class="card border-danger">
+                        <div class="card-body text-center">
+                            <i class="bi bi-wifi-off text-danger mb-3" style="font-size: 3rem;"></i>
+                            <h5 class="text-danger">Backend API Unavailable</h5>
+                            <p class="text-muted mb-4">
+                                The backend API server may not be running. Please start the API server to enable full functionality.
+                            </p>
+                            <div class="bg-dark text-light p-3 rounded mb-3">
+                                <code>python start_api.py</code>
+                            </div>
+                            <button class="btn btn-outline-primary" onclick="location.reload()">
+                                <i class="bi bi-arrow-clockwise"></i>
+                                Retry Connection
+                            </button>
+                        </div>
+                    </div>
+                {% elif health %}
+                    <!-- Overall Status -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card border-{% if health.status == 'healthy' %}success{% else %}warning{% endif %}">
+                                <div class="card-body text-center">
+                                    {% if health.status == 'healthy' %}
+                                        <i class="bi bi-check-circle-fill text-success mb-3" style="font-size: 3rem;"></i>
+                                        <h4 class="text-success">System Healthy</h4>
+                                        <p class="text-muted">All systems operational</p>
+                                    {% else %}
+                                        <i class="bi bi-exclamation-triangle-fill text-warning mb-3" style="font-size: 3rem;"></i>
+                                        <h4 class="text-warning">System Degraded</h4>
+                                        <p class="text-muted">Some components may not be fully operational</p>
+                                    {% endif %}
+                                    <small class="text-muted">Last checked: {{ health.timestamp }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Component Status -->
+                    <div class="row g-4 mb-4">
                         <div class="col-md-6">
-                            <div class="card mb-3">
+                            <div class="card h-100">
                                 <div class="card-header">
-                                    <h5>API Information</h5>
+                                    <h5>
+                                        <i class="bi bi-server"></i>
+                                        API Information
+                                    </h5>
                                 </div>
                                 <div class="card-body">
-                                    <table class="table table-striped">
-                                        <tbody>
-                                            <tr>
-                                                <th>API Version</th>
-                                                <td>{{ health.api_version }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Timestamp</th>
-                                                <td>{{ health.timestamp }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Active Tasks</th>
-                                                <td>{{ health.system_info.active_tasks }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                                                <div>
+                                                    <h6 class="mb-1">API Version</h6>
+                                                    <small class="text-muted">Core system version</small>
+                                                </div>
+                                                <span class="badge bg-primary">{{ health.api_version }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                                                <div>
+                                                    <h6 class="mb-1">Active Tasks</h6>
+                                                    <small class="text-muted">Background processes</small>
+                                                </div>
+                                                <span class="badge bg-info">{{ health.system_info.active_tasks }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                                                <div>
+                                                    <h6 class="mb-1">Uptime</h6>
+                                                    <small class="text-muted">System availability</small>
+                                                </div>
+                                                <span class="status-indicator status-healthy">
+                                                    <i class="bi bi-check-circle-fill"></i>
+                                                    Online
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="col-md-6">
-                            <div class="card mb-3">
+                            <div class="card h-100">
                                 <div class="card-header">
-                                    <h5>Model Status</h5>
+                                    <h5>
+                                        <i class="bi bi-cpu"></i>
+                                        ML Model Status
+                                    </h5>
                                 </div>
                                 <div class="card-body">
-                                    <table class="table table-striped">
-                                        <tbody>
-                                            {% for model_name, is_loaded in health.models_loaded.items() %}
-                                            <tr>
-                                                <th>{{ model_name }}</th>
-                                                <td>
-                                                    {% if is_loaded %}
-                                                        <span class="badge bg-success">Loaded</span>
-                                                    {% else %}
-                                                        <span class="badge bg-danger">Not Loaded</span>
-                                                    {% endif %}
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
+                                    <div class="row g-3">
+                                        {% for model_name, is_loaded in health.models_loaded.items() %}
+                                        <div class="col-12">
+                                            <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                                                <div>
+                                                    <h6 class="mb-1">{{ model_name|title|replace('_', ' ') }}</h6>
+                                                    <small class="text-muted">
+                                                        {% if model_name == 'power_predictors' %}
+                                                            Performance prediction models
+                                                        {% elif model_name == 'simulation_engine' %}
+                                                            Physics simulation engine
+                                                        {% elif model_name == 'weather_api' %}
+                                                            Weather data service
+                                                        {% else %}
+                                                            System component
+                                                        {% endif %}
+                                                    </small>
+                                                </div>
+                                                {% if is_loaded %}
+                                                    <span class="status-indicator status-healthy">
+                                                        <i class="bi bi-check-circle-fill"></i>
+                                                        Ready
+                                                    </span>
+                                                {% else %}
+                                                    <span class="status-indicator status-error">
+                                                        <i class="bi bi-x-circle-fill"></i>
+                                                        Not Ready
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-12">
+                    <!-- Feature Availability -->
+                    <div class="row mb-4">
+                        <div class="col-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h5>System Information</h5>
+                                    <h5>
+                                        <i class="bi bi-list-check"></i>
+                                        Feature Availability
+                                    </h5>
                                 </div>
                                 <div class="card-body">
-                                    <pre class="bg-light p-3 rounded"><code>{{ health.system_info | tojson(indent=2) }}</code></pre>
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <div class="text-center p-3 border rounded">
+                                                <i class="bi bi-calculator text-primary mb-2" style="font-size: 2rem;"></i>
+                                                <h6>Link Simulation</h6>
+                                                {% if health.models_loaded.simulation_engine %}
+                                                    <span class="status-indicator status-healthy">
+                                                        <i class="bi bi-check-circle-fill"></i>
+                                                        Available
+                                                    </span>
+                                                {% else %}
+                                                    <span class="status-indicator status-error">
+                                                        <i class="bi bi-x-circle-fill"></i>
+                                                        Unavailable
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="text-center p-3 border rounded">
+                                                <i class="bi bi-robot text-success mb-2" style="font-size: 2rem;"></i>
+                                                <h6>AI Optimization</h6>
+                                                {% if health.models_loaded.power_predictors %}
+                                                    <span class="status-indicator status-healthy">
+                                                        <i class="bi bi-check-circle-fill"></i>
+                                                        Available
+                                                    </span>
+                                                {% else %}
+                                                    <span class="status-indicator status-error">
+                                                        <i class="bi bi-x-circle-fill"></i>
+                                                        Unavailable
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="text-center p-3 border rounded">
+                                                <i class="bi bi-cloud-rain text-info mb-2" style="font-size: 2rem;"></i>
+                                                <h6>Weather Data</h6>
+                                                {% if health.models_loaded.weather_api %}
+                                                    <span class="status-indicator status-healthy">
+                                                        <i class="bi bi-check-circle-fill"></i>
+                                                        Available
+                                                    </span>
+                                                {% else %}
+                                                    <span class="status-indicator status-error">
+                                                        <i class="bi bi-x-circle-fill"></i>
+                                                        Unavailable
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- System Information -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>
+                                        <i class="bi bi-info-circle"></i>
+                                        Detailed System Information
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="accordion" id="systemInfoAccordion">
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#systemInfoCollapse">
+                                                    <i class="bi bi-code-square me-2"></i>
+                                                    View Raw System Data
+                                                </button>
+                                            </h2>
+                                            <div id="systemInfoCollapse" class="accordion-collapse collapse" data-bs-parent="#systemInfoAccordion">
+                                                <div class="accordion-body">
+                                                    <pre><code>{{ health.system_info | tojson(indent=2) }}</code></pre>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -92,4 +254,15 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-refresh health status every 30 seconds
+setInterval(function() {
+    if (!document.hidden) {
+        location.reload();
+    }
+}, 30000);
+</script>
 {% endblock %}

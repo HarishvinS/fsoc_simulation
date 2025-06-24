@@ -4,102 +4,40 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-12">
         <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h3>Optimization Results</h3>
+            <div class="card-header">
+                <h3>
+                    <i class="bi bi-robot"></i>
+                    AI Optimization Results
+                </h3>
                 <div>
-                    <a href="/optimize" class="btn btn-outline-primary">New Optimization</a>
+                    <a href="/optimize" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-left"></i>
+                        New Optimization
+                    </a>
                 </div>
             </div>
             <div class="card-body">
                 {% if result.success %}
                     <div class="alert alert-success">
-                        <strong>Success!</strong> Optimization completed with confidence score: {{ "%.2f"|format(result.confidence_score * 100) }}%.
+                        <i class="bi bi-check-circle-fill"></i>
+                        <strong>Optimization Completed!</strong> 
+                        AI analysis complete with {{ "%.0f"|format(result.confidence_score * 100) }}% confidence.
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card mb-3">
-                                <div class="card-header">
-                                    <h5>Recommended Configuration</h5>
+                    <!-- Confidence Score -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card border-primary">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">
+                                        <i class="bi bi-graph-up"></i>
+                                        Optimization Confidence
+                                    </h5>
                                 </div>
                                 <div class="card-body">
-                                    <table class="table table-striped">
-                                        <tbody>
-                                            <tr>
-                                                <th>Optimization ID</th>
-                                                <td>{{ result.optimization_id }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Timestamp</th>
-                                                <td>{{ result.timestamp }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Transmitter Height</th>
-                                                <td>{{ "%.2f"|format(result.recommendations.tx_height_m) }} m</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Receiver Height</th>
-                                                <td>{{ "%.2f"|format(result.recommendations.rx_height_m) }} m</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Transmitter Material</th>
-                                                <td>{{ result.recommendations.tx_material }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Receiver Material</th>
-                                                <td>{{ result.recommendations.rx_material }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Wavelength</th>
-                                                <td>{{ result.recommendations.wavelength_nm }} nm</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Transmitter Power</th>
-                                                <td>{{ "%.2f"|format(result.recommendations.tx_power_dbm) }} dBm</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <div class="card mb-3">
-                                <div class="card-header">
-                                    <h5>Performance Metrics</h5>
-                                </div>
-                                <div class="card-body">
-                                    <table class="table table-striped">
-                                        <tbody>
-                                            <tr>
-                                                <th>Expected Received Power</th>
-                                                <td>{{ "%.2f"|format(result.recommendations.expected_rx_power_dbm) }} dBm</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Link Margin</th>
-                                                <td>{{ "%.2f"|format(result.recommendations.link_margin_db) }} dB</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Expected Reliability</th>
-                                                <td>{{ "%.2f"|format(result.recommendations.expected_reliability * 100) }}%</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Optimization Score</th>
-                                                <td>{{ "%.2f"|format(result.recommendations.optimization_score) }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5>Confidence Score</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="progress" style="height: 30px;">
+                                    <div class="progress mb-3" style="height: 30px;">
                                         <div class="progress-bar 
                                             {% if result.confidence_score < 0.5 %}
                                                 bg-danger
@@ -116,33 +54,188 @@
                                             {{ "%.0f"|format(result.confidence_score * 100) }}%
                                         </div>
                                     </div>
+                                    <p class="mb-0 text-muted">
+                                        {% if result.confidence_score >= 0.8 %}
+                                            <i class="bi bi-check-circle text-success"></i>
+                                            High confidence - Recommended configuration should perform well
+                                        {% elif result.confidence_score >= 0.5 %}
+                                            <i class="bi bi-exclamation-triangle text-warning"></i>
+                                            Moderate confidence - Consider additional analysis
+                                        {% else %}
+                                            <i class="bi bi-x-circle text-danger"></i>
+                                            Low confidence - Challenging conditions detected
+                                        {% endif %}
+                                    </p>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="row mt-3">
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5>Optimization Details</h5>
+                    <!-- Recommended Configuration -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <div class="card h-100 border-success">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0">
+                                        <i class="bi bi-gear-fill"></i>
+                                        Recommended Configuration
+                                    </h5>
                                 </div>
                                 <div class="card-body">
-                                    <pre class="bg-light p-3 rounded"><code>{{ result.recommendations | tojson(indent=2) }}</code></pre>
+                                    <div class="row g-3">
+                                        <div class="col-6">
+                                            <div class="text-center p-3 bg-light rounded">
+                                                <i class="bi bi-broadcast text-primary mb-2" style="font-size: 1.5rem;"></i>
+                                                <h6>{{ "%.1f"|format(result.recommendations.tx_height_m) }} m</h6>
+                                                <small class="text-muted">Tx Height</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="text-center p-3 bg-light rounded">
+                                                <i class="bi bi-reception-4 text-success mb-2" style="font-size: 1.5rem;"></i>
+                                                <h6>{{ "%.1f"|format(result.recommendations.rx_height_m) }} m</h6>
+                                                <small class="text-muted">Rx Height</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="text-center p-3 bg-light rounded">
+                                                <i class="bi bi-tools text-warning mb-2" style="font-size: 1.5rem;"></i>
+                                                <h6>{{ result.recommendations.tx_material|title|replace('_', ' ') }}</h6>
+                                                <small class="text-muted">Tx Material</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="text-center p-3 bg-light rounded">
+                                                <i class="bi bi-tools text-info mb-2" style="font-size: 1.5rem;"></i>
+                                                <h6>{{ result.recommendations.rx_material|title|replace('_', ' ') }}</h6>
+                                                <small class="text-muted">Rx Material</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card h-100 border-info">
+                                <div class="card-header bg-info text-white">
+                                    <h5 class="mb-0">
+                                        <i class="bi bi-graph-up"></i>
+                                        Expected Performance
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-6">
+                                            <div class="text-center p-3 bg-light rounded">
+                                                <i class="bi bi-reception-4 text-primary mb-2" style="font-size: 1.5rem;"></i>
+                                                <h6>{{ "%.1f"|format(result.recommendations.expected_rx_power_dbm) }} dBm</h6>
+                                                <small class="text-muted">Rx Power</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="text-center p-3 bg-light rounded">
+                                                <i class="bi bi-shield-check text-success mb-2" style="font-size: 1.5rem;"></i>
+                                                <h6>{{ "%.1f"|format(result.recommendations.link_margin_db) }} dB</h6>
+                                                <small class="text-muted">Link Margin</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="text-center p-3 bg-light rounded">
+                                                <i class="bi bi-percent text-warning mb-2" style="font-size: 1.5rem;"></i>
+                                                <h6>{{ "%.1f"|format(result.recommendations.expected_reliability * 100) }}%</h6>
+                                                <small class="text-muted">Reliability</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="text-center p-3 bg-light rounded">
+                                                <i class="bi bi-star text-info mb-2" style="font-size: 1.5rem;"></i>
+                                                <h6>{{ "%.0f"|format(result.recommendations.optimization_score) }}</h6>
+                                                <small class="text-muted">Score</small>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="row mt-3">
-                        <div class="col-md-12">
+                    <!-- System Parameters -->
+                    <div class="row mb-4">
+                        <div class="col-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h5>Simulate This Configuration</h5>
+                                    <h5>
+                                        <i class="bi bi-sliders"></i>
+                                        Complete System Specification
+                                    </h5>
                                 </div>
                                 <div class="card-body">
-                                    <p>Run a detailed simulation with these optimized parameters:</p>
-                                    <form method="POST" action="/simulate">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <table class="table table-striped">
+                                                <tbody>
+                                                    <tr>
+                                                        <th><i class="bi bi-lightning"></i> Tx Power</th>
+                                                        <td>{{ "%.1f"|format(result.recommendations.tx_power_dbm) }} dBm</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th><i class="bi bi-lightbulb"></i> Wavelength</th>
+                                                        <td>{{ result.recommendations.wavelength_nm }} nm</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th><i class="bi bi-rulers"></i> Link Distance</th>
+                                                        <td>{{ "%.2f"|format(((result.recommendations.lat_tx - result.recommendations.lat_rx)**2 + (result.recommendations.lon_tx - result.recommendations.lon_rx)**2)**0.5 * 111) }} km</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th><i class="bi bi-cloud-fog"></i> Avg. Fog</th>
+                                                        <td>{{ result.recommendations.avg_fog_density }} g/m³</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <table class="table table-striped">
+                                                <tbody>
+                                                    <tr>
+                                                        <th><i class="bi bi-cloud-rain"></i> Avg. Rain</th>
+                                                        <td>{{ result.recommendations.avg_rain_rate }} mm/hr</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th><i class="bi bi-thermometer-sun"></i> Surface Temp</th>
+                                                        <td>{{ result.recommendations.avg_surface_temp }}°C</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th><i class="bi bi-thermometer"></i> Ambient Temp</th>
+                                                        <td>{{ result.recommendations.avg_ambient_temp }}°C</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th><i class="bi bi-calendar-check"></i> Timestamp</th>
+                                                        <td>{{ result.timestamp }}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h5 class="mb-3">
+                                        <i class="bi bi-play-circle"></i>
+                                        Next Steps
+                                    </h5>
+                                    <p class="text-muted mb-3">
+                                        Validate these recommendations by running a detailed simulation with the optimized parameters.
+                                    </p>
+                                    
+                                    <form method="POST" action="/simulate" class="d-inline">
                                         <input type="hidden" name="lat_tx" value="{{ result.recommendations.lat_tx }}">
                                         <input type="hidden" name="lon_tx" value="{{ result.recommendations.lon_tx }}">
                                         <input type="hidden" name="height_tx" value="{{ result.recommendations.tx_height_m }}">
@@ -163,7 +256,10 @@
                                         
                                         <input type="hidden" name="detailed_output" value="true">
                                         
-                                        <button type="submit" class="btn btn-primary">Run Detailed Simulation</button>
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            <i class="bi bi-calculator"></i>
+                                            Run Detailed Simulation
+                                        </button>
                                     </form>
                                 </div>
                             </div>
@@ -171,7 +267,20 @@
                     </div>
                 {% else %}
                     <div class="alert alert-danger">
-                        <strong>Error:</strong> {{ result.error_message }}
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <strong>Optimization Failed:</strong> {{ result.error_message }}
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <i class="bi bi-robot" style="font-size: 3rem; color: #dc2626;"></i>
+                            <h5 class="mt-3">AI Optimization Unavailable</h5>
+                            <p class="text-muted">The optimization service may not be ready. Please ensure the ML models are trained and loaded.</p>
+                            <a href="/health" class="btn btn-outline-primary">
+                                <i class="bi bi-heart-pulse"></i>
+                                Check System Health
+                            </a>
+                        </div>
                     </div>
                 {% endif %}
             </div>

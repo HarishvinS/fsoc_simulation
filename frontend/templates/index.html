@@ -3,19 +3,27 @@
 {% block title %}FSOC Link Optimization - Home{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
+<!-- Hero Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card feature-card text-center">
             <div class="card-body">
-                <h1 class="card-title">FSOC Link Optimization</h1>
-                <p class="card-text">
-                    Welcome to the Free Space Optical Communication (FSOC) Link Optimization tool. 
-                    This application helps you simulate and optimize FSOC links for various environmental conditions.
+                <i class="bi bi-broadcast text-gradient"></i>
+                <h1 class="display-5 fw-bold text-gradient mb-3">FSOC Link Optimization</h1>
+                <p class="lead text-secondary mb-4">
+                    Advanced Free Space Optical Communication link simulation and optimization platform. 
+                    Predict performance, optimize deployments, and ensure reliable optical links under various environmental conditions.
                 </p>
                 
                 {% if backend_status == False %}
                 <div class="alert alert-warning" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
                     <strong>Warning:</strong> Cannot connect to backend API. Make sure the backend server is running.
+                </div>
+                {% else %}
+                <div class="status-indicator status-healthy">
+                    <i class="bi bi-check-circle-fill"></i>
+                    System Online
                 </div>
                 {% endif %}
             </div>
@@ -23,58 +31,159 @@
     </div>
 </div>
 
-<div class="row">
+<!-- Main Features -->
+<div class="row g-4 mb-5">
     <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5>Simulate Link</h5>
-            </div>
+        <div class="card feature-card h-100">
             <div class="card-body">
-                <p>Run simulations to predict FSOC link performance under specific environmental conditions.</p>
-                <a href="/simulate" class="btn btn-primary">Start Simulation</a>
+                <i class="bi bi-calculator"></i>
+                <h5>Link Performance Simulation</h5>
+                <p>Run comprehensive simulations to predict FSOC link performance under specific environmental conditions including fog, rain, and thermal effects.</p>
+                <a href="/simulate" class="btn btn-primary">
+                    <i class="bi bi-play-fill"></i>
+                    Start Simulation
+                </a>
             </div>
         </div>
     </div>
     
     <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5>Optimize Deployment</h5>
-            </div>
+        <div class="card feature-card h-100">
             <div class="card-body">
-                <p>Get recommendations for optimal deployment parameters based on your constraints.</p>
-                <a href="/optimize" class="btn btn-primary">Start Optimization</a>
+                <i class="bi bi-gear"></i>
+                <h5>AI-Powered Optimization</h5>
+                <p>Get intelligent recommendations for optimal deployment parameters based on your constraints and environmental conditions.</p>
+                <a href="/optimize" class="btn btn-primary">
+                    <i class="bi bi-robot"></i>
+                    Start Optimization
+                </a>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row mt-4">
-    <div class="col-md-12">
+<!-- Example Simulations -->
+<div class="row mb-5">
+    <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h5>Example Simulations</h5>
+                <h5>
+                    <i class="bi bi-lightning-charge"></i>
+                    Quick Start Examples
+                </h5>
             </div>
             <div class="card-body">
-                <p>Run pre-configured example simulations to see how the system works:</p>
-                <div class="d-flex gap-2">
-                    <a href="/examples?type=urban" class="btn btn-primary">Urban Link Example</a>
-                    <a href="/examples?type=rural" class="btn btn-primary">Rural Link Example</a>
+                <p class="text-secondary mb-4">
+                    Explore pre-configured example simulations to see how the system works:
+                </p>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="card border-2 border-primary">
+                            <div class="card-body text-center">
+                                <i class="bi bi-building text-primary mb-3" style="font-size: 2rem;"></i>
+                                <h6 class="fw-bold">Urban Link Example</h6>
+                                <p class="text-muted small mb-3">San Francisco deployment with moderate fog conditions</p>
+                                <a href="/examples?type=urban" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-play"></i>
+                                    Run Urban Example
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border-2 border-success">
+                            <div class="card-body text-center">
+                                <i class="bi bi-tree text-success mb-3" style="font-size: 2rem;"></i>
+                                <h6 class="fw-bold">Rural Link Example</h6>
+                                <p class="text-muted small mb-3">Long-distance rural deployment with rain conditions</p>
+                                <a href="/examples?type=rural" class="btn btn-outline-success btn-sm">
+                                    <i class="bi bi-play"></i>
+                                    Run Rural Example
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row mt-4">
-    <div class="col-md-12">
+<!-- Features Grid -->
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-cloud-rain text-primary mb-3" style="font-size: 2.5rem;"></i>
+                <h6 class="fw-bold">Weather Modeling</h6>
+                <p class="text-muted small">Advanced atmospheric modeling including fog density, rain rate, and thermal gradients</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-graph-up text-success mb-3" style="font-size: 2.5rem;"></i>
+                <h6 class="fw-bold">Performance Prediction</h6>
+                <p class="text-muted small">Accurate link budget analysis with detailed loss breakdown and margin calculations</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-cpu text-warning mb-3" style="font-size: 2.5rem;"></i>
+                <h6 class="fw-bold">Machine Learning</h6>
+                <p class="text-muted small">AI-powered optimization using trained models for deployment recommendations</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Status -->
+<div class="row">
+    <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h5>System Health</h5>
+                <h5>
+                    <i class="bi bi-heart-pulse"></i>
+                    System Status
+                </h5>
             </div>
             <div class="card-body">
-                <p>Check the status of the backend API and model availability.</p>
-                <a href="/health" class="btn btn-outline-secondary">View System Health</a>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded">
+                            <div>
+                                <h6 class="mb-1">Backend API</h6>
+                                <small class="text-muted">Core simulation engine</small>
+                            </div>
+                            {% if backend_status %}
+                            <span class="status-indicator status-healthy">
+                                <i class="bi bi-check-circle-fill"></i>
+                                Online
+                            </span>
+                            {% else %}
+                            <span class="status-indicator status-error">
+                                <i class="bi bi-x-circle-fill"></i>
+                                Offline
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded">
+                            <div>
+                                <h6 class="mb-1">ML Models</h6>
+                                <small class="text-muted">Optimization algorithms</small>
+                            </div>
+                            <a href="/health" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-info-circle"></i>
+                                Check Status
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

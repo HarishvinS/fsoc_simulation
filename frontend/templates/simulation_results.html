@@ -4,58 +4,106 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-12">
         <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h3>Simulation Results</h3>
+            <div class="card-header">
+                <h3>
+                    <i class="bi bi-graph-up"></i>
+                    Simulation Results
+                </h3>
                 <div>
-                    <a href="/simulate" class="btn btn-outline-primary">New Simulation</a>
+                    <a href="/simulate" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-left"></i>
+                        New Simulation
+                    </a>
                 </div>
             </div>
             <div class="card-body">
                 {% if result.success %}
                     <div class="alert alert-success">
-                        <strong>Success!</strong> Simulation completed in {{ "%.2f"|format(result.execution_time_seconds) }} seconds.
+                        <i class="bi bi-check-circle-fill"></i>
+                        <strong>Simulation Completed!</strong> 
+                        Processed in {{ "%.2f"|format(result.execution_time_seconds) }} seconds.
                     </div>
                     
-                    <div class="row">
+                    <!-- Key Metrics -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-3">
+                            <div class="card text-center border-primary">
+                                <div class="card-body">
+                                    <i class="bi bi-reception-4 text-primary mb-2" style="font-size: 2rem;"></i>
+                                    <h5 class="text-primary">{{ "%.1f"|format(result.results.received_power_dbm) }}</h5>
+                                    <small class="text-muted">Received Power (dBm)</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center border-warning">
+                                <div class="card-body">
+                                    <i class="bi bi-arrow-down text-warning mb-2" style="font-size: 2rem;"></i>
+                                    <h5 class="text-warning">{{ "%.1f"|format(result.results.total_loss_db) }}</h5>
+                                    <small class="text-muted">Total Loss (dB)</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center border-info">
+                                <div class="card-body">
+                                    <i class="bi bi-shield-check text-info mb-2" style="font-size: 2rem;"></i>
+                                    <h5 class="text-info">{{ "%.1f"|format(result.results.link_margin_db) }}</h5>
+                                    <small class="text-muted">Link Margin (dB)</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center {% if result.results.link_available %}border-success{% else %}border-danger{% endif %}">
+                                <div class="card-body">
+                                    {% if result.results.link_available %}
+                                        <i class="bi bi-check-circle text-success mb-2" style="font-size: 2rem;"></i>
+                                        <h5 class="text-success">VIABLE</h5>
+                                    {% else %}
+                                        <i class="bi bi-x-circle text-danger mb-2" style="font-size: 2rem;"></i>
+                                        <h5 class="text-danger">NOT VIABLE</h5>
+                                    {% endif %}
+                                    <small class="text-muted">Link Status</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Detailed Results -->
+                    <div class="row g-4">
+                        <!-- Link Summary -->
                         <div class="col-md-6">
-                            <div class="card mb-3">
+                            <div class="card h-100">
                                 <div class="card-header">
-                                    <h5>Link Summary</h5>
+                                    <h5>
+                                        <i class="bi bi-info-circle"></i>
+                                        Link Summary
+                                    </h5>
                                 </div>
                                 <div class="card-body">
                                     <table class="table table-striped">
                                         <tbody>
                                             <tr>
-                                                <th>Simulation ID</th>
-                                                <td>{{ result.simulation_id }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Timestamp</th>
-                                                <td>{{ result.timestamp }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Link Distance</th>
+                                                <th><i class="bi bi-rulers"></i> Distance</th>
                                                 <td>{{ "%.2f"|format(result.results.link_distance_km) }} km</td>
                                             </tr>
                                             <tr>
-                                                <th>Received Power</th>
-                                                <td>{{ "%.2f"|format(result.results.received_power_dbm) }} dBm</td>
+                                                <th><i class="bi bi-arrow-up-right"></i> Elevation</th>
+                                                <td>{{ "%.2f"|format(result.results.elevation_angle_deg) }}°</td>
                                             </tr>
                                             <tr>
-                                                <th>Link Margin</th>
-                                                <td>{{ "%.2f"|format(result.results.link_margin_db) }} dB</td>
+                                                <th><i class="bi bi-lightning"></i> Tx Power</th>
+                                                <td>{{ result.results.input_parameters.tx_power_dbm }} dBm</td>
                                             </tr>
                                             <tr>
-                                                <th>Link Status</th>
-                                                <td>
-                                                    {% if result.results.link_viable %}
-                                                        <span class="badge bg-success">Viable</span>
-                                                    {% else %}
-                                                        <span class="badge bg-danger">Not Viable</span>
-                                                    {% endif %}
-                                                </td>
+                                                <th><i class="bi bi-lightbulb"></i> Wavelength</th>
+                                                <td>{{ result.results.input_parameters.wavelength_nm }} nm</td>
+                                            </tr>
+                                            <tr>
+                                                <th><i class="bi bi-percent"></i> Availability</th>
+                                                <td>{{ "%.1f"|format(result.results.estimated_availability * 100) }}%</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -63,65 +111,192 @@
                             </div>
                         </div>
                         
+                        <!-- Loss Breakdown Chart -->
                         <div class="col-md-6">
-                            <div class="card mb-3">
+                            <div class="card h-100">
                                 <div class="card-header">
-                                    <h5>Loss Breakdown</h5>
+                                    <h5>
+                                        <i class="bi bi-pie-chart"></i>
+                                        Loss Breakdown
+                                    </h5>
                                 </div>
                                 <div class="card-body">
-                                    <div id="loss-chart" class="visualization"></div>
+                                    <div id="loss-chart" class="visualization" style="height: 300px;"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    {% if result.results.detailed_results %}
-                    <div class="row">
-                        <div class="col-md-12">
+                    <!-- Environmental Conditions -->
+                    <div class="row g-4 mt-2">
+                        <div class="col-md-6">
                             <div class="card">
                                 <div class="card-header">
-                                    <h5>Detailed Layer Results</h5>
+                                    <h5>
+                                        <i class="bi bi-cloud-rain"></i>
+                                        Environmental Conditions
+                                    </h5>
                                 </div>
                                 <div class="card-body">
-                                    <table class="table table-striped table-sm">
-                                        <thead>
-                                            <tr>
-                                                <th>Layer</th>
-                                                <th>Loss (dB)</th>
-                                                <th>Description</th>
-                                            </tr>
-                                        </thead>
+                                    <div class="row g-3">
+                                        <div class="col-6">
+                                            <div class="text-center p-3 bg-light rounded">
+                                                <i class="bi bi-cloud-fog text-primary mb-2" style="font-size: 1.5rem;"></i>
+                                                <h6>{{ result.results.input_parameters.fog_density }} g/m³</h6>
+                                                <small class="text-muted">Fog Density</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="text-center p-3 bg-light rounded">
+                                                <i class="bi bi-cloud-rain text-info mb-2" style="font-size: 1.5rem;"></i>
+                                                <h6>{{ result.results.input_parameters.rain_rate }} mm/hr</h6>
+                                                <small class="text-muted">Rain Rate</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="text-center p-3 bg-light rounded">
+                                                <i class="bi bi-thermometer-sun text-warning mb-2" style="font-size: 1.5rem;"></i>
+                                                <h6>{{ result.results.input_parameters.surface_temp }}°C</h6>
+                                                <small class="text-muted">Surface Temp</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="text-center p-3 bg-light rounded">
+                                                <i class="bi bi-thermometer text-secondary mb-2" style="font-size: 1.5rem;"></i>
+                                                <h6>{{ result.results.input_parameters.ambient_temp }}°C</h6>
+                                                <small class="text-muted">Ambient Temp</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Beam Analysis -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>
+                                        <i class="bi bi-broadcast"></i>
+                                        Beam Analysis
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    {% if result.results.beam_analysis %}
+                                    <table class="table table-sm">
                                         <tbody>
-                                            {% for layer in result.results.detailed_results.layers %}
                                             <tr>
-                                                <td>{{ layer.name }}</td>
-                                                <td>{{ "%.2f"|format(layer.loss_db) }}</td>
-                                                <td>{{ layer.description }}</td>
+                                                <th>Initial Diameter</th>
+                                                <td>{{ "%.3f"|format(result.results.beam_analysis.initial_diameter_m) }} m</td>
                                             </tr>
-                                            {% endfor %}
+                                            <tr>
+                                                <th>Final Diameter</th>
+                                                <td>{{ "%.3f"|format(result.results.beam_analysis.final_diameter_m) }} m</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Spreading Ratio</th>
+                                                <td>{{ "%.2f"|format(result.results.beam_analysis.beam_spreading_ratio) }}x</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Steering Angle</th>
+                                                <td>{{ "%.2f"|format(result.results.beam_analysis.total_steering_angle_mrad) }} mrad</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Scintillation</th>
+                                                <td>{{ "%.3f"|format(result.results.beam_analysis.scintillation_index) }}</td>
+                                            </tr>
                                         </tbody>
                                     </table>
+                                    {% else %}
+                                    <p class="text-muted">Beam analysis data not available</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Detailed Layer Results -->
+                    {% if result.results.layer_results %}
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>
+                                        <i class="bi bi-layers"></i>
+                                        Atmospheric Layer Analysis
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Layer</th>
+                                                    <th>Length (m)</th>
+                                                    <th>Power (W)</th>
+                                                    <th>Beam Ø (m)</th>
+                                                    <th>Fog (g/m³)</th>
+                                                    <th>Rain (mm/hr)</th>
+                                                    <th>Temp (°C)</th>
+                                                    <th>Attenuation (m⁻¹)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for layer in result.results.layer_results %}
+                                                <tr>
+                                                    <td>{{ layer.layer_index + 1 }}</td>
+                                                    <td>{{ "%.1f"|format(layer.segment_length_m) }}</td>
+                                                    <td>{{ "%.6f"|format(layer.power_watts) }}</td>
+                                                    <td>{{ "%.3f"|format(layer.beam_diameter_m) }}</td>
+                                                    <td>{{ "%.2f"|format(layer.layer_properties.fog_density) }}</td>
+                                                    <td>{{ "%.1f"|format(layer.layer_properties.rain_rate) }}</td>
+                                                    <td>{{ "%.1f"|format(layer.layer_properties.temperature_c) }}</td>
+                                                    <td>{{ "%.6f"|format(layer.layer_properties.alpha_total) }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     {% endif %}
                     
-                    <div class="row mt-3">
-                        <div class="col-md-12">
+                    <!-- Raw Data (Collapsible) -->
+                    <div class="row mt-4">
+                        <div class="col-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h5>Raw Results</h5>
+                                    <h5>
+                                        <i class="bi bi-code-square"></i>
+                                        Raw Simulation Data
+                                    </h5>
                                 </div>
                                 <div class="card-body">
-                                    <pre class="bg-light p-3 rounded"><code>{{ result.results | tojson(indent=2) }}</code></pre>
+                                    <div class="accordion" id="rawDataAccordion">
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#rawDataCollapse">
+                                                    <i class="bi bi-file-earmark-code me-2"></i>
+                                                    View Complete Results JSON
+                                                </button>
+                                            </h2>
+                                            <div id="rawDataCollapse" class="accordion-collapse collapse" data-bs-parent="#rawDataAccordion">
+                                                <div class="accordion-body">
+                                                    <pre><code>{{ result.results | tojson(indent=2) }}</code></pre>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 {% else %}
                     <div class="alert alert-danger">
-                        <strong>Error:</strong> {{ result.error_message }}
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <strong>Simulation Failed:</strong> {{ result.error_message }}
                     </div>
                 {% endif %}
             </div>
@@ -133,50 +308,55 @@
 {% block scripts %}
 {% if result.success %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Extract loss data from results
-        const results = {{ result.results | tojson }};
-        
-        // Prepare data for loss breakdown chart
-        const lossTypes = [];
-        const lossValues = [];
-        
-        if (results.loss_breakdown) {
-            for (const [key, value] of Object.entries(results.loss_breakdown)) {
-                lossTypes.push(key.replace('_loss_db', '').replace(/_/g, ' '));
+document.addEventListener('DOMContentLoaded', function() {
+    // Extract loss data from results
+    const results = {{ result.results | tojson }};
+    
+    // Prepare data for loss breakdown chart
+    const lossTypes = [];
+    const lossValues = [];
+    const colors = ['#2563eb', '#dc2626', '#059669', '#d97706', '#7c3aed'];
+    
+    if (results.loss_breakdown) {
+        let colorIndex = 0;
+        for (const [key, value] of Object.entries(results.loss_breakdown)) {
+            if (value > 0.01) { // Only show significant losses
+                lossTypes.push(key.replace('_loss_db', '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()));
                 lossValues.push(value);
+                colorIndex++;
             }
         }
-        
-        // Create loss breakdown chart
-        const lossData = [{
-            x: lossTypes,
-            y: lossValues,
-            type: 'bar',
-            marker: {
-                color: 'rgba(50, 98, 235, 0.7)'
-            }
-        }];
-        
-        const lossLayout = {
-            title: 'Loss Contributions (dB)',
-            xaxis: {
-                title: 'Loss Type'
-            },
-            yaxis: {
-                title: 'Loss (dB)'
-            },
-            margin: {
-                l: 50,
-                r: 50,
-                b: 100,
-                t: 50,
-                pad: 4
-            }
-        };
-        
-        Plotly.newPlot('loss-chart', lossData, lossLayout);
-    });
+    }
+    
+    // Create loss breakdown pie chart
+    const lossData = [{
+        values: lossValues,
+        labels: lossTypes,
+        type: 'pie',
+        marker: {
+            colors: colors.slice(0, lossValues.length)
+        },
+        textinfo: 'label+percent',
+        textposition: 'outside',
+        hovertemplate: '<b>%{label}</b><br>Loss: %{value:.2f} dB<br>Percentage: %{percent}<extra></extra>'
+    }];
+    
+    const lossLayout = {
+        margin: { t: 20, b: 20, l: 20, r: 20 },
+        showlegend: false,
+        font: {
+            family: 'Inter, sans-serif',
+            size: 12
+        }
+    };
+    
+    const config = {
+        responsive: true,
+        displayModeBar: false
+    };
+    
+    Plotly.newPlot('loss-chart', lossData, lossLayout, config);
+});
 </script>
 {% endif %}
 {% endblock %}

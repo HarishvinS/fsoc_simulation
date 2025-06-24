@@ -4,67 +4,122 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h3>Simulate FSOC Link</h3>
+                <h3>
+                    <i class="bi bi-calculator"></i>
+                    Simulate FSOC Link Performance
+                </h3>
             </div>
             <div class="card-body">
-                <form method="POST" action="/simulate">
-                    <div class="row">
-                        <!-- Transmitter Section -->
+                <p class="text-secondary mb-4">
+                    Configure your FSOC link parameters and environmental conditions to predict performance and analyze link viability.
+                </p>
+                
+                <form method="POST" action="/simulate" id="simulationForm">
+                    <!-- Location Configuration -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h4 class="text-primary mb-3">
+                                <i class="bi bi-geo-alt"></i>
+                                Link Geometry
+                            </h4>
+                        </div>
+                        
                         <div class="col-md-6">
-                            <h4>Transmitter</h4>
-                            <div class="mb-3">
-                                <label for="lat_tx" class="form-label">Latitude (degrees)</label>
-                                <input type="number" step="0.0001" class="form-control" id="lat_tx" name="lat_tx" required min="-90" max="90" value="37.7749">
-                            </div>
-                            <div class="mb-3">
-                                <label for="lon_tx" class="form-label">Longitude (degrees)</label>
-                                <input type="number" step="0.0001" class="form-control" id="lon_tx" name="lon_tx" required min="-180" max="180" value="-122.4194">
-                            </div>
-                            <div class="mb-3">
-                                <label for="height_tx" class="form-label">Height (meters)</label>
-                                <input type="number" step="0.1" class="form-control" id="height_tx" name="height_tx" required min="1" max="1000" value="20">
-                            </div>
-                            <div class="mb-3">
-                                <label for="material_tx" class="form-label">Mount Material</label>
-                                <select class="form-select" id="material_tx" name="material_tx" required>
-                                    <option value="white_paint">White Paint</option>
-                                    <option value="black_paint">Black Paint</option>
-                                    <option value="aluminum">Aluminum</option>
-                                    <option value="steel">Steel</option>
-                                    <option value="concrete">Concrete</option>
-                                    <option value="wood">Wood</option>
-                                </select>
+                            <div class="card border-primary">
+                                <div class="card-header bg-primary text-white">
+                                    <h6 class="mb-0">
+                                        <i class="bi bi-broadcast"></i>
+                                        Transmitter
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="lat_tx" class="form-label">Latitude (°)</label>
+                                                <input type="number" step="0.0001" class="form-control" id="lat_tx" name="lat_tx" required min="-90" max="90" value="37.7749">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="lon_tx" class="form-label">Longitude (°)</label>
+                                                <input type="number" step="0.0001" class="form-control" id="lon_tx" name="lon_tx" required min="-180" max="180" value="-122.4194">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="height_tx" class="form-label">Height (m)</label>
+                                                <input type="number" step="0.1" class="form-control" id="height_tx" name="height_tx" required min="1" max="1000" value="20">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="material_tx" class="form-label">Mount Material</label>
+                                                <select class="form-select" id="material_tx" name="material_tx" required>
+                                                    <option value="white_paint" selected>White Paint</option>
+                                                    <option value="black_paint">Black Paint</option>
+                                                    <option value="aluminum">Aluminum</option>
+                                                    <option value="steel">Steel</option>
+                                                    <option value="concrete">Concrete</option>
+                                                    <option value="wood">Wood</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         
-                        <!-- Receiver Section -->
                         <div class="col-md-6">
-                            <h4>Receiver</h4>
-                            <div class="mb-3">
-                                <label for="lat_rx" class="form-label">Latitude (degrees)</label>
-                                <input type="number" step="0.0001" class="form-control" id="lat_rx" name="lat_rx" required min="-90" max="90" value="37.7849">
-                            </div>
-                            <div class="mb-3">
-                                <label for="lon_rx" class="form-label">Longitude (degrees)</label>
-                                <input type="number" step="0.0001" class="form-control" id="lon_rx" name="lon_rx" required min="-180" max="180" value="-122.4094">
-                            </div>
-                            <div class="mb-3">
-                                <label for="height_rx" class="form-label">Height (meters)</label>
-                                <input type="number" step="0.1" class="form-control" id="height_rx" name="height_rx" required min="1" max="1000" value="15">
-                            </div>
-                            <div class="mb-3">
-                                <label for="material_rx" class="form-label">Mount Material</label>
-                                <select class="form-select" id="material_rx" name="material_rx" required>
-                                    <option value="white_paint">White Paint</option>
-                                    <option value="black_paint">Black Paint</option>
-                                    <option value="aluminum" selected>Aluminum</option>
-                                    <option value="steel">Steel</option>
-                                    <option value="concrete">Concrete</option>
-                                    <option value="wood">Wood</option>
-                                </select>
+                            <div class="card border-success">
+                                <div class="card-header bg-success text-white">
+                                    <h6 class="mb-0">
+                                        <i class="bi bi-reception-4"></i>
+                                        Receiver
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="lat_rx" class="form-label">Latitude (°)</label>
+                                                <input type="number" step="0.0001" class="form-control" id="lat_rx" name="lat_rx" required min="-90" max="90" value="37.7849">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="lon_rx" class="form-label">Longitude (°)</label>
+                                                <input type="number" step="0.0001" class="form-control" id="lon_rx" name="lon_rx" required min="-180" max="180" value="-122.4094">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="height_rx" class="form-label">Height (m)</label>
+                                                <input type="number" step="0.1" class="form-control" id="height_rx" name="height_rx" required min="1" max="1000" value="15">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="material_rx" class="form-label">Mount Material</label>
+                                                <select class="form-select" id="material_rx" name="material_rx" required>
+                                                    <option value="white_paint">White Paint</option>
+                                                    <option value="black_paint">Black Paint</option>
+                                                    <option value="aluminum" selected>Aluminum</option>
+                                                    <option value="steel">Steel</option>
+                                                    <option value="concrete">Concrete</option>
+                                                    <option value="wood">Wood</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -72,32 +127,52 @@
                     <hr>
                     
                     <!-- Environmental Conditions -->
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h4>Environmental Conditions</h4>
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h4 class="text-primary mb-3">
+                                <i class="bi bi-cloud-rain"></i>
+                                Environmental Conditions
+                            </h4>
                         </div>
+                        
                         <div class="col-md-3">
                             <div class="mb-3">
-                                <label for="fog_density" class="form-label">Fog Density (g/m³)</label>
+                                <label for="fog_density" class="form-label">
+                                    <i class="bi bi-cloud-fog"></i>
+                                    Fog Density (g/m³)
+                                </label>
                                 <input type="number" step="0.1" class="form-control" id="fog_density" name="fog_density" required min="0" max="10" value="0.5">
+                                <div class="form-text">Water content in atmosphere</div>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="mb-3">
-                                <label for="rain_rate" class="form-label">Rain Rate (mm/hr)</label>
+                                <label for="rain_rate" class="form-label">
+                                    <i class="bi bi-cloud-rain"></i>
+                                    Rain Rate (mm/hr)
+                                </label>
                                 <input type="number" step="0.1" class="form-control" id="rain_rate" name="rain_rate" required min="0" max="200" value="2.0">
+                                <div class="form-text">Precipitation intensity</div>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="mb-3">
-                                <label for="surface_temp" class="form-label">Surface Temp (°C)</label>
+                                <label for="surface_temp" class="form-label">
+                                    <i class="bi bi-thermometer-sun"></i>
+                                    Surface Temp (°C)
+                                </label>
                                 <input type="number" step="0.1" class="form-control" id="surface_temp" name="surface_temp" required min="-40" max="80" value="25">
+                                <div class="form-text">Ground/mount temperature</div>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="mb-3">
-                                <label for="ambient_temp" class="form-label">Ambient Temp (°C)</label>
+                                <label for="ambient_temp" class="form-label">
+                                    <i class="bi bi-thermometer"></i>
+                                    Ambient Temp (°C)
+                                </label>
                                 <input type="number" step="0.1" class="form-control" id="ambient_temp" name="ambient_temp" required min="-40" max="60" value="20">
+                                <div class="form-text">Air temperature</div>
                             </div>
                         </div>
                     </div>
@@ -105,36 +180,117 @@
                     <hr>
                     
                     <!-- System Parameters -->
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h4>System Parameters</h4>
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h4 class="text-primary mb-3">
+                                <i class="bi bi-gear"></i>
+                                System Parameters
+                            </h4>
                         </div>
+                        
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="wavelength_nm" class="form-label">Wavelength (nm)</label>
-                                <input type="number" step="1" class="form-control" id="wavelength_nm" name="wavelength_nm" min="800" max="2000" value="1550">
+                                <label for="wavelength_nm" class="form-label">
+                                    <i class="bi bi-lightbulb"></i>
+                                    Wavelength (nm)
+                                </label>
+                                <select class="form-select" id="wavelength_nm" name="wavelength_nm">
+                                    <option value="850">850 nm (Near-IR)</option>
+                                    <option value="1310">1310 nm (O-band)</option>
+                                    <option value="1550" selected>1550 nm (C-band)</option>
+                                </select>
+                                <div class="form-text">Optical carrier wavelength</div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="tx_power_dbm" class="form-label">Transmitter Power (dBm)</label>
+                                <label for="tx_power_dbm" class="form-label">
+                                    <i class="bi bi-lightning"></i>
+                                    Transmitter Power (dBm)
+                                </label>
                                 <input type="number" step="0.1" class="form-control" id="tx_power_dbm" name="tx_power_dbm" min="-10" max="50" value="20">
+                                <div class="form-text">Optical output power</div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="detailed_output" name="detailed_output">
-                        <label class="form-check-label" for="detailed_output">Include detailed layer-by-layer results</label>
+                    <!-- Advanced Options -->
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="detailed_output" name="detailed_output">
+                                <label class="form-check-label" for="detailed_output">
+                                    <i class="bi bi-list-ul"></i>
+                                    Include detailed layer-by-layer analysis
+                                </label>
+                                <div class="form-text">Provides atmospheric layer breakdown and propagation details</div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <button type="reset" class="btn btn-secondary">Reset</button>
-                        <button type="submit" class="btn btn-primary">Run Simulation</button>
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-3 justify-content-end">
+                        <button type="reset" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-clockwise"></i>
+                            Reset Form
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <i class="bi bi-play-fill"></i>
+                            Run Simulation
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('simulationForm');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    form.addEventListener('submit', function() {
+        submitBtn.innerHTML = '<span class="loading-spinner"></span> Running Simulation...';
+        submitBtn.disabled = true;
+    });
+    
+    // Calculate and display link distance
+    function updateLinkDistance() {
+        const lat1 = parseFloat(document.getElementById('lat_tx').value);
+        const lon1 = parseFloat(document.getElementById('lon_tx').value);
+        const lat2 = parseFloat(document.getElementById('lat_rx').value);
+        const lon2 = parseFloat(document.getElementById('lon_rx').value);
+        
+        if (lat1 && lon1 && lat2 && lon2) {
+            const R = 6371; // Earth's radius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                     Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                     Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            const distance = R * c;
+            
+            // Display distance if elements exist
+            const distanceDisplay = document.getElementById('linkDistance');
+            if (distanceDisplay) {
+                distanceDisplay.textContent = distance.toFixed(2) + ' km';
+            }
+        }
+    }
+    
+    // Add event listeners for coordinate inputs
+    ['lat_tx', 'lon_tx', 'lat_rx', 'lon_rx'].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('input', updateLinkDistance);
+        }
+    });
+    
+    updateLinkDistance();
+});
+</script>
 {% endblock %}
