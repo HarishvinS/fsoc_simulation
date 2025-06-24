@@ -1,0 +1,15 @@
+{
+  "lat_tx": 40.7128,
+  "lon_tx": -74.0060,
+  "lat_rx": 40.7589,
+  "lon_rx": -73.9851,
+  "avg_fog_density": 0.1,
+  "avg_rain_rate": 2.0,
+  "avg_surface_temp": 25.0,
+  "avg_ambient_temp": 20.0,
+  "min_height": 5.0,
+  "max_height": 50.0,
+  "available_materials": ["concrete", "white_paint", "aluminum"],
+  "min_received_power_dbm": -30.0,
+  "reliability_target": 0.99
+}

@@ -16,6 +16,9 @@ from datetime import datetime
 
 app = Flask(__name__)
 
+# Configuration
+API_BASE_URL = "http://localhost:8002"  # FastAPI backend URL
+
 # Check backend connection on startup
 def check_backend_connection():
     """Check if backend API is available"""
@@ -31,9 +34,6 @@ def check_backend_connection():
 # Try to connect to backend
 backend_available = check_backend_connection()
 
-# Configuration
-API_BASE_URL = "http://localhost:8001"  # FastAPI backend URL
-
 # Add retry logic for API connections
 def api_request(method, endpoint, **kwargs):
     """Make API request with retry logic"""
@@ -44,6 +44,10 @@ def api_request(method, endpoint, **kwargs):
     
     for attempt in range(max_retries):
         try:
+            # Add proper headers for JSON requests
+            if 'json' in kwargs and 'headers' not in kwargs:
+                kwargs['headers'] = {'Content-Type': 'application/json'}
+            
             if method.lower() == 'get':
                 return requests.get(f"{API_BASE_URL}{endpoint}", **kwargs)
             elif method.lower() == 'post':

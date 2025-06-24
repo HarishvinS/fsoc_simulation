@@ -19,6 +19,7 @@ import asyncio
 from datetime import datetime
 import logging
 import traceback
+from pathlib import Path
 
 # Import our modules
 from ..ingest.input_schema import (
@@ -58,6 +59,60 @@ model_manager = ModelManager()
 
 # Background task tracking
 active_tasks = {}
+
+
+# Startup event to load models
+@app.on_event("startup")
+async def startup_event():
+    """Load trained models on startup."""
+    logger.info("Loading trained models on startup...")
+
+    try:
+        # Get the models directory path
+        models_dir = Path(__file__).parent.parent.parent / "models"
+
+        # Check if model files exist
+        rf_model_path = models_dir / "power_predictor_random_forest.pkl"
+        xgb_model_path = models_dir / "power_predictor_xgboost.pkl"
+
+        models_loaded = 0
+
+        # Load Random Forest model if it exists
+        if rf_model_path.exists():
+            try:
+                rf_model = PowerPredictorModel("random_forest")
+                rf_model.load_model(str(rf_model_path))
+                model_manager.power_predictors["random_forest"] = rf_model
+                models_loaded += 1
+                logger.info("✓ Random Forest model loaded successfully")
+            except Exception as e:
+                logger.error(f"✗ Failed to load Random Forest model: {e}")
+        else:
+            logger.warning(f"✗ Random Forest model not found at {rf_model_path}")
+
+        # Load XGBoost model if it exists
+        if xgb_model_path.exists():
+            try:
+                xgb_model = PowerPredictorModel("xgboost")
+                xgb_model.load_model(str(xgb_model_path))
+                model_manager.power_predictors["xgboost"] = xgb_model
+                models_loaded += 1
+                logger.info("✓ XGBoost model loaded successfully")
+            except Exception as e:
+                logger.error(f"✗ Failed to load XGBoost model: {e}")
+        else:
+            logger.warning(f"✗ XGBoost model not found at {xgb_model_path}")
+
+        if models_loaded > 0:
+            logger.info(f"🎉 Successfully loaded {models_loaded} prediction models")
+            logger.info("🚀 Optimization feature is now available!")
+        else:
+            logger.warning("⚠️  No prediction models loaded. Optimization feature will not work.")
+            logger.info("💡 To train models, run: python train_models.py --train")
+
+    except Exception as e:
+        logger.error(f"❌ Error during model loading: {e}")
+        logger.error(traceback.format_exc())
 
 
 # Response models

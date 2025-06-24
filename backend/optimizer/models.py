@@ -425,18 +425,53 @@ class DeploymentOptimizerModel:
             test_config = base_conditions.copy()
             for name, value in zip(param_names, combination):
                 test_config[f'input_{name}'] = value
-            
+
             # Add required derived features
             test_config['link_distance_km'] = link_distance_km
-            
+
             # Calculate elevation angle
             height_diff = test_config.get('input_height_tx', 20) - test_config.get('input_height_rx', 20)
             elevation_angle_deg = math.degrees(math.atan2(height_diff, link_distance_km * 1000))
             test_config['elevation_angle_deg'] = elevation_angle_deg
-            
+
+            # Create DataFrame with the exact features expected by the saved model
+            # Model expects: ['height_tx', 'height_rx', 'fog_density', 'rain_rate', 'surface_temp',
+            # 'ambient_temp', 'wavelength_nm', 'link_distance_km', 'material_tx', 'material_rx',
+            # 'thermal_gradient', 'atmospheric_loading', 'height_differential', 'scattering_potential']
+            required_features = {
+                'height_tx': test_config.get('input_height_tx', 20),
+                'height_rx': test_config.get('input_height_rx', 20),
+                'fog_density': test_config.get('input_fog_density', 0.1),
+                'rain_rate': test_config.get('input_rain_rate', 2.0),
+                'surface_temp': test_config.get('input_surface_temp', 25.0),
+                'ambient_temp': test_config.get('input_ambient_temp', 20.0),
+                'wavelength_nm': test_config.get('input_wavelength_nm', 1550),
+                'link_distance_km': link_distance_km,
+                'material_tx': test_config.get('input_material_tx', 'white_paint'),
+                'material_rx': test_config.get('input_material_rx', 'white_paint'),
+                'thermal_gradient': 0.0,  # Default value
+                'atmospheric_loading': 0.0,  # Default value
+                'height_differential': test_config.get('input_height_tx', 20) - test_config.get('input_height_rx', 20),
+                'scattering_potential': test_config.get('input_fog_density', 0.1) * test_config.get('input_rain_rate', 2.0)
+            }
+
             # Predict performance
             try:
-                predicted_power = self.power_predictor.predict(test_config)
+                # Convert to DataFrame and predict directly with the model
+                features_df = pd.DataFrame([required_features])
+
+                # Handle categorical features (material_tx and material_rx)
+                # Use the same encoding as the model was trained with
+                if 'material_tx' in features_df.columns:
+                    material_mapping = {'concrete': 0, 'white_paint': 1, 'aluminum': 2, 'steel': 3, 'wood': 4, 'black_paint': 5}
+                    features_df['material_tx'] = features_df['material_tx'].map(material_mapping).fillna(1)  # Default to white_paint
+
+                if 'material_rx' in features_df.columns:
+                    material_mapping = {'concrete': 0, 'white_paint': 1, 'aluminum': 2, 'steel': 3, 'wood': 4, 'black_paint': 5}
+                    features_df['material_rx'] = features_df['material_rx'].map(material_mapping).fillna(1)  # Default to white_paint
+
+                # Predict using the underlying model directly
+                predicted_power = self.power_predictor.model.predict(features_df)[0]
                 
                 # Calculate score based on target
                 if target == "max_power":

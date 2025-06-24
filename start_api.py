@@ -13,13 +13,13 @@ import uvicorn
 
 if __name__ == "__main__":
     print("Starting FSOC Link Optimization API...")
-    print("Documentation available at: http://localhost:8001/docs")
+    print("Documentation available at: http://localhost:8002/docs")
     print("Press Ctrl+C to stop the server")
     
     uvicorn.run(
         "backend.api.main:app",
         host="0.0.0.0",
-        port=8001,
+        port=8002,
         reload=False,
         log_level="info"
     )
