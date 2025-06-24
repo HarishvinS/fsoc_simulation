@@ -1,189 +1,174 @@
 {% extends "base.html" %}
 
-{% block title %}FSOC Link Optimization - Home{% endblock %}
+{% block title %}FSOC Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<div class="row mb-5">
-    <div class="col-12">
-        <div class="card feature-card text-center">
-            <div class="card-body">
-                <i class="bi bi-broadcast text-gradient"></i>
-                <h1 class="display-5 fw-bold text-gradient mb-3">FSOC Link Optimization</h1>
-                <p class="lead text-secondary mb-4">
-                    Advanced Free Space Optical Communication link simulation and optimization platform. 
-                    Predict performance, optimize deployments, and ensure reliable optical links under various environmental conditions.
-                </p>
-                
-                {% if backend_status == False %}
-                <div class="alert alert-warning" role="alert">
-                    <i class="bi bi-exclamation-triangle-fill"></i>
-                    <strong>Warning:</strong> Cannot connect to backend API. Make sure the backend server is running.
-                </div>
-                {% else %}
-                <div class="status-indicator status-healthy">
-                    <i class="bi bi-check-circle-fill"></i>
-                    System Online
-                </div>
-                {% endif %}
-            </div>
-        </div>
+<!-- Key Metrics -->
+<div class="grid grid-cols-4 mb-6">
+    <div class="metric-card">
+        <div class="metric-icon">📡</div>
+        <div class="metric-value">1.2k</div>
+        <div class="metric-label">Links Simulated</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon">⚡</div>
+        <div class="metric-value">98.5%</div>
+        <div class="metric-label">Avg Reliability</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon">🎯</div>
+        <div class="metric-value">-18.2</div>
+        <div class="metric-label">Avg Rx Power (dBm)</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon">🔧</div>
+        <div class="metric-value">156</div>
+        <div class="metric-label">Optimizations</div>
     </div>
 </div>
 
-<!-- Main Features -->
-<div class="row g-4 mb-5">
-    <div class="col-md-6">
-        <div class="card feature-card h-100">
-            <div class="card-body">
-                <i class="bi bi-calculator"></i>
-                <h5>Link Performance Simulation</h5>
-                <p>Run comprehensive simulations to predict FSOC link performance under specific environmental conditions including fog, rain, and thermal effects.</p>
-                <a href="/simulate" class="btn btn-primary">
-                    <i class="bi bi-play-fill"></i>
-                    Start Simulation
-                </a>
-            </div>
+<!-- Quick Actions -->
+<div class="grid grid-cols-2 mb-6">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                </svg>
+                Link Simulation
+            </h3>
         </div>
+        <p class="text-secondary mb-4">Predict FSOC link performance under specific environmental conditions with advanced atmospheric modeling.</p>
+        <a href="/simulate" class="btn btn-primary">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+            </svg>
+            Start Simulation
+        </a>
     </div>
     
-    <div class="col-md-6">
-        <div class="card feature-card h-100">
-            <div class="card-body">
-                <i class="bi bi-gear"></i>
-                <h5>AI-Powered Optimization</h5>
-                <p>Get intelligent recommendations for optimal deployment parameters based on your constraints and environmental conditions.</p>
-                <a href="/optimize" class="btn btn-primary">
-                    <i class="bi bi-robot"></i>
-                    Start Optimization
-                </a>
-            </div>
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                AI Optimization
+            </h3>
         </div>
-    </div>
-</div>
-
-<!-- Example Simulations -->
-<div class="row mb-5">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5>
-                    <i class="bi bi-lightning-charge"></i>
-                    Quick Start Examples
-                </h5>
-            </div>
-            <div class="card-body">
-                <p class="text-secondary mb-4">
-                    Explore pre-configured example simulations to see how the system works:
-                </p>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <div class="card border-2 border-primary">
-                            <div class="card-body text-center">
-                                <i class="bi bi-building text-primary mb-3" style="font-size: 2rem;"></i>
-                                <h6 class="fw-bold">Urban Link Example</h6>
-                                <p class="text-muted small mb-3">San Francisco deployment with moderate fog conditions</p>
-                                <a href="/examples?type=urban" class="btn btn-outline-primary btn-sm">
-                                    <i class="bi bi-play"></i>
-                                    Run Urban Example
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card border-2 border-success">
-                            <div class="card-body text-center">
-                                <i class="bi bi-tree text-success mb-3" style="font-size: 2rem;"></i>
-                                <h6 class="fw-bold">Rural Link Example</h6>
-                                <p class="text-muted small mb-3">Long-distance rural deployment with rain conditions</p>
-                                <a href="/examples?type=rural" class="btn btn-outline-success btn-sm">
-                                    <i class="bi bi-play"></i>
-                                    Run Rural Example
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Features Grid -->
-<div class="row g-4 mb-5">
-    <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <i class="bi bi-cloud-rain text-primary mb-3" style="font-size: 2.5rem;"></i>
-                <h6 class="fw-bold">Weather Modeling</h6>
-                <p class="text-muted small">Advanced atmospheric modeling including fog density, rain rate, and thermal gradients</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <i class="bi bi-graph-up text-success mb-3" style="font-size: 2.5rem;"></i>
-                <h6 class="fw-bold">Performance Prediction</h6>
-                <p class="text-muted small">Accurate link budget analysis with detailed loss breakdown and margin calculations</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <i class="bi bi-cpu text-warning mb-3" style="font-size: 2.5rem;"></i>
-                <h6 class="fw-bold">Machine Learning</h6>
-                <p class="text-muted small">AI-powered optimization using trained models for deployment recommendations</p>
-            </div>
-        </div>
+        <p class="text-secondary mb-4">Get intelligent deployment recommendations using machine learning models trained on thousands of simulations.</p>
+        <a href="/optimize" class="btn btn-primary">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path>
+            </svg>
+            Start Optimization
+        </a>
     </div>
 </div>
 
 <!-- System Status -->
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5>
-                    <i class="bi bi-heart-pulse"></i>
-                    System Status
-                </h5>
+<div class="grid grid-cols-3 mb-6">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path>
+                </svg>
+                Backend API
+            </h3>
+        </div>
+        <div class="flex items-center justify-between">
+            <span class="text-secondary">Core simulation engine</span>
+            {% if backend_status %}
+            <span class="badge badge-success">
+                <div class="status-dot"></div>
+                Online
+            </span>
+            {% else %}
+            <span class="badge badge-danger">
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent-danger);"></div>
+                Offline
+            </span>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+                ML Models
+            </h3>
+        </div>
+        <div class="flex items-center justify-between">
+            <span class="text-secondary">Prediction algorithms</span>
+            <span class="badge badge-success">
+                <div class="status-dot"></div>
+                Ready
+            </span>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+                </svg>
+                Weather Data
+            </h3>
+        </div>
+        <div class="flex items-center justify-between">
+            <span class="text-secondary">Environmental conditions</span>
+            <span class="badge badge-success">
+                <div class="status-dot"></div>
+                Active
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">
+            <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Quick Start
+        </h3>
+    </div>
+    
+    <div class="grid grid-cols-2 gap-4">
+        <div class="card" style="background: var(--bg-secondary); border-color: var(--accent-primary);">
+            <div class="text-center">
+                <div style="width: 48px; height: 48px; margin: 0 auto 1rem; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">🏙️</div>
+                <h4 class="mb-2">Urban Link Example</h4>
+                <p class="text-secondary mb-4">San Francisco deployment with moderate fog conditions</p>
+                <a href="/examples?type=urban" class="btn btn-secondary">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                    </svg>
+                    Run Example
+                </a>
             </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded">
-                            <div>
-                                <h6 class="mb-1">Backend API</h6>
-                                <small class="text-muted">Core simulation engine</small>
-                            </div>
-                            {% if backend_status %}
-                            <span class="status-indicator status-healthy">
-                                <i class="bi bi-check-circle-fill"></i>
-                                Online
-                            </span>
-                            {% else %}
-                            <span class="status-indicator status-error">
-                                <i class="bi bi-x-circle-fill"></i>
-                                Offline
-                            </span>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded">
-                            <div>
-                                <h6 class="mb-1">ML Models</h6>
-                                <small class="text-muted">Optimization algorithms</small>
-                            </div>
-                            <a href="/health" class="btn btn-outline-secondary btn-sm">
-                                <i class="bi bi-info-circle"></i>
-                                Check Status
-                            </a>
-                        </div>
-                    </div>
-                </div>
+        </div>
+        
+        <div class="card" style="background: var(--bg-secondary); border-color: var(--accent-success);">
+            <div class="text-center">
+                <div style="width: 48px; height: 48px; margin: 0 auto 1rem; background: linear-gradient(135deg, var(--accent-success), #059669); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">🌲</div>
+                <h4 class="mb-2">Rural Link Example</h4>
+                <p class="text-secondary mb-4">Long-distance rural deployment with rain conditions</p>
+                <a href="/examples?type=rural" class="btn btn-secondary">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                    </svg>
+                    Run Example
+                </a>
             </div>
         </div>
     </div>

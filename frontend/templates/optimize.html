@@ -1,305 +1,203 @@
 {% extends "base.html" %}
 
-{% block title %}FSOC Link Optimization - Optimize Deployment{% endblock %}
+{% block title %}FSOC Optimization{% endblock %}
+{% block page_title %}AI Optimization{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
+<form method="POST" action="/optimize" id="optimizationForm">
+    <!-- Location Configuration -->
+    <div class="grid grid-cols-2 mb-6">
         <div class="card">
             <div class="card-header">
-                <h3>
-                    <i class="bi bi-gear"></i>
-                    AI-Powered Deployment Optimization
+                <h3 class="card-title">
+                    <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
+                    </svg>
+                    Transmitter Location
                 </h3>
             </div>
-            <div class="card-body">
-                <p class="text-secondary mb-4">
-                    Get intelligent recommendations for optimal FSOC link deployment parameters based on your location, constraints, and expected environmental conditions.
-                </p>
-                
-                <form method="POST" action="/optimize" id="optimizationForm">
-                    <!-- Location Section -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h4 class="text-primary mb-3">
-                                <i class="bi bi-geo-alt"></i>
-                                Link Locations
-                            </h4>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <div class="card border-primary">
-                                <div class="card-header bg-primary text-white">
-                                    <h6 class="mb-0">
-                                        <i class="bi bi-broadcast"></i>
-                                        Transmitter Location
-                                    </h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="lat_tx" class="form-label">Latitude (°)</label>
-                                                <input type="number" step="0.0001" class="form-control" id="lat_tx" name="lat_tx" required min="-90" max="90" value="37.7749">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="lon_tx" class="form-label">Longitude (°)</label>
-                                                <input type="number" step="0.0001" class="form-control" id="lon_tx" name="lon_tx" required min="-180" max="180" value="-122.4194">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <div class="card border-success">
-                                <div class="card-header bg-success text-white">
-                                    <h6 class="mb-0">
-                                        <i class="bi bi-reception-4"></i>
-                                        Receiver Location
-                                    </h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="lat_rx" class="form-label">Latitude (°)</label>
-                                                <input type="number" step="0.0001" class="form-control" id="lat_rx" name="lat_rx" required min="-90" max="90" value="37.7849">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="lon_rx" class="form-label">Longitude (°)</label>
-                                                <input type="number" step="0.0001" class="form-control" id="lon_rx" name="lon_rx" required min="-180" max="180" value="-122.4094">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <hr>
-                    
-                    <!-- Expected Conditions -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h4 class="text-primary mb-3">
-                                <i class="bi bi-cloud-rain"></i>
-                                Expected Environmental Conditions
-                            </h4>
-                            <p class="text-muted mb-3">Provide average or typical conditions for this location</p>
-                        </div>
-                        
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                <label for="avg_fog_density" class="form-label">
-                                    <i class="bi bi-cloud-fog"></i>
-                                    Avg. Fog Density (g/m³)
-                                </label>
-                                <input type="number" step="0.1" class="form-control" id="avg_fog_density" name="avg_fog_density" min="0" max="5" value="0.1">
-                                <div class="form-text">Typical fog conditions</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                <label for="avg_rain_rate" class="form-label">
-                                    <i class="bi bi-cloud-rain"></i>
-                                    Avg. Rain Rate (mm/hr)
-                                </label>
-                                <input type="number" step="0.1" class="form-control" id="avg_rain_rate" name="avg_rain_rate" min="0" max="50" value="2.0">
-                                <div class="form-text">Average precipitation</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                <label for="avg_surface_temp" class="form-label">
-                                    <i class="bi bi-thermometer-sun"></i>
-                                    Avg. Surface Temp (°C)
-                                </label>
-                                <input type="number" step="0.1" class="form-control" id="avg_surface_temp" name="avg_surface_temp" min="-20" max="60" value="25.0">
-                                <div class="form-text">Typical surface heating</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                <label for="avg_ambient_temp" class="form-label">
-                                    <i class="bi bi-thermometer"></i>
-                                    Avg. Ambient Temp (°C)
-                                </label>
-                                <input type="number" step="0.1" class="form-control" id="avg_ambient_temp" name="avg_ambient_temp" min="-30" max="50" value="20.0">
-                                <div class="form-text">Average air temperature</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <hr>
-                    
-                    <!-- Constraints -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h4 class="text-primary mb-3">
-                                <i class="bi bi-sliders"></i>
-                                Deployment Constraints
-                            </h4>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="min_height" class="form-label">
-                                    <i class="bi bi-arrow-down"></i>
-                                    Minimum Height (m)
-                                </label>
-                                <input type="number" step="0.1" class="form-control" id="min_height" name="min_height" min="1" max="100" value="5">
-                                <div class="form-text">Lowest allowable mounting height</div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="max_height" class="form-label">
-                                    <i class="bi bi-arrow-up"></i>
-                                    Maximum Height (m)
-                                </label>
-                                <input type="number" step="0.1" class="form-control" id="max_height" name="max_height" min="10" max="1000" value="100">
-                                <div class="form-text">Highest allowable mounting height</div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-12">
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    <i class="bi bi-tools"></i>
-                                    Available Materials
-                                </label>
-                                <div class="row g-2">
-                                    <div class="col-md-2">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="available_materials" value="white_paint" id="material_white_paint" checked>
-                                            <label class="form-check-label" for="material_white_paint">
-                                                <i class="bi bi-circle-fill text-light"></i>
-                                                White Paint
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="available_materials" value="black_paint" id="material_black_paint">
-                                            <label class="form-check-label" for="material_black_paint">
-                                                <i class="bi bi-circle-fill text-dark"></i>
-                                                Black Paint
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="available_materials" value="aluminum" id="material_aluminum" checked>
-                                            <label class="form-check-label" for="material_aluminum">
-                                                <i class="bi bi-circle-fill text-secondary"></i>
-                                                Aluminum
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="available_materials" value="steel" id="material_steel" checked>
-                                            <label class="form-check-label" for="material_steel">
-                                                <i class="bi bi-circle-fill text-muted"></i>
-                                                Steel
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="available_materials" value="concrete" id="material_concrete">
-                                            <label class="form-check-label" for="material_concrete">
-                                                <i class="bi bi-circle-fill" style="color: #6c757d;"></i>
-                                                Concrete
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="available_materials" value="wood" id="material_wood">
-                                            <label class="form-check-label" for="material_wood">
-                                                <i class="bi bi-circle-fill" style="color: #8b4513;"></i>
-                                                Wood
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <hr>
-                    
-                    <!-- Performance Requirements -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h4 class="text-primary mb-3">
-                                <i class="bi bi-target"></i>
-                                Performance Requirements
-                            </h4>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="min_received_power_dbm" class="form-label">
-                                    <i class="bi bi-reception-4"></i>
-                                    Min. Received Power (dBm)
-                                </label>
-                                <input type="number" step="0.1" class="form-control" id="min_received_power_dbm" name="min_received_power_dbm" value="-30">
-                                <div class="form-text">Minimum acceptable signal level</div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="reliability_target" class="form-label">
-                                    <i class="bi bi-shield-check"></i>
-                                    Reliability Target
-                                </label>
-                                <select class="form-select" id="reliability_target" name="reliability_target">
-                                    <option value="0.90">90% (Basic)</option>
-                                    <option value="0.95">95% (Good)</option>
-                                    <option value="0.99" selected>99% (High)</option>
-                                    <option value="0.999">99.9% (Critical)</option>
-                                </select>
-                                <div class="form-text">Required link availability</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Action Buttons -->
-                    <div class="d-flex gap-3 justify-content-end">
-                        <button type="reset" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-clockwise"></i>
-                            Reset Form
-                        </button>
-                        <button type="submit" class="btn btn-success" id="optimizeBtn">
-                            <i class="bi bi-robot"></i>
-                            Run AI Optimization
-                        </button>
-                    </div>
-                </form>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label class="form-label">Latitude (°)</label>
+                    <input type="number" step="0.0001" class="form-control" name="lat_tx" required min="-90" max="90" value="37.7749">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Longitude (°)</label>
+                    <input type="number" step="0.0001" class="form-control" name="lon_tx" required min="-180" max="180" value="-122.4194">
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                    </svg>
+                    Receiver Location
+                </h3>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label class="form-label">Latitude (°)</label>
+                    <input type="number" step="0.0001" class="form-control" name="lat_rx" required min="-90" max="90" value="37.7849">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Longitude (°)</label>
+                    <input type="number" step="0.0001" class="form-control" name="lon_rx" required min="-180" max="180" value="-122.4094">
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Environmental Conditions -->
+    <div class="card mb-6">
+        <div class="card-header">
+            <h3 class="card-title">
+                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+                </svg>
+                Expected Environmental Conditions
+            </h3>
+        </div>
+        
+        <div class="grid grid-cols-4 gap-4">
+            <div class="form-group">
+                <label class="form-label">Avg. Fog Density (g/m³)</label>
+                <input type="number" step="0.1" class="form-control" name="avg_fog_density" min="0" max="5" value="0.1">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Avg. Rain Rate (mm/hr)</label>
+                <input type="number" step="0.1" class="form-control" name="avg_rain_rate" min="0" max="50" value="2.0">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Avg. Surface Temp (°C)</label>
+                <input type="number" step="0.1" class="form-control" name="avg_surface_temp" min="-20" max="60" value="25.0">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Avg. Ambient Temp (°C)</label>
+                <input type="number" step="0.1" class="form-control" name="avg_ambient_temp" min="-30" max="50" value="20.0">
+            </div>
+        </div>
+    </div>
+
+    <!-- Constraints -->
+    <div class="grid grid-cols-2 mb-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
+                    </svg>
+                    Height Constraints
+                </h3>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label class="form-label">Minimum Height (m)</label>
+                    <input type="number" step="0.1" class="form-control" name="min_height" min="1" max="100" value="5">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Maximum Height (m)</label>
+                    <input type="number" step="0.1" class="form-control" name="max_height" min="10" max="1000" value="100">
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                    </svg>
+                    Performance Requirements
+                </h3>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label class="form-label">Min. Received Power (dBm)</label>
+                    <input type="number" step="0.1" class="form-control" name="min_received_power_dbm" value="-30">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Reliability Target</label>
+                    <select class="form-control form-select" name="reliability_target">
+                        <option value="0.90">90% (Basic)</option>
+                        <option value="0.95">95% (Good)</option>
+                        <option value="0.99" selected>99% (High)</option>
+                        <option value="0.999">99.9% (Critical)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Materials -->
+    <div class="card mb-6">
+        <div class="card-header">
+            <h3 class="card-title">
+                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                </svg>
+                Available Materials
+            </h3>
+        </div>
+        
+        <div class="grid grid-cols-3 gap-4">
+            <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer;">
+                <input type="checkbox" name="available_materials" value="white_paint" checked>
+                <span>White Paint</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer;">
+                <input type="checkbox" name="available_materials" value="aluminum" checked>
+                <span>Aluminum</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer;">
+                <input type="checkbox" name="available_materials" value="steel" checked>
+                <span>Steel</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer;">
+                <input type="checkbox" name="available_materials" value="black_paint">
+                <span>Black Paint</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer;">
+                <input type="checkbox" name="available_materials" value="concrete">
+                <span>Concrete</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer;">
+                <input type="checkbox" name="available_materials" value="wood">
+                <span>Wood</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex justify-between">
+        <button type="reset" class="btn btn-secondary">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path>
+            </svg>
+            Reset
+        </button>
+        <button type="submit" class="btn btn-primary" id="optimizeBtn">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path>
+            </svg>
+            Run AI Optimization
+        </button>
+    </div>
+</form>
 {% endblock %}
 
 {% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('optimizationForm');
-    const optimizeBtn = document.getElementById('optimizeBtn');
-    
-    form.addEventListener('submit', function() {
-        optimizeBtn.innerHTML = '<span class="loading-spinner"></span> Running Optimization...';
-        optimizeBtn.disabled = true;
-    });
+document.getElementById('optimizationForm').addEventListener('submit', function() {
+    const btn = document.getElementById('optimizeBtn');
+    btn.innerHTML = '<div class="loading-spinner"></div> Optimizing...';
+    btn.disabled = true;
 });
 </script>
 {% endblock %}
