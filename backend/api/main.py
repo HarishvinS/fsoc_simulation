@@ -19,8 +19,6 @@ import asyncio
 from datetime import datetime
 import logging
 import traceback
-import os
-from pathlib import Path
 
 # Import our modules
 from ..ingest.input_schema import (
@@ -31,24 +29,17 @@ from ..simulation.engine import FSocSimulationEngine
 from ..optimizer.models import ModelManager, PowerPredictorModel
 from ..ingest.mock_weather import MockWeatherAPI
 
-# Configure logging for production
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-# Production settings
-ENVIRONMENT = os.getenv("ENVIRONMENT", "production")
-DEBUG = os.getenv("DEBUG", "false").lower() == "true"
 
 # Create FastAPI app
 app = FastAPI(
     title="FSOC Link Optimization API",
-    description="Production API for Free Space Optical Communication link optimization",
+    description="API for Free Space Optical Communication link performance prediction and deployment optimization",
     version="1.0.0",
-    docs_url="/docs" if DEBUG else None,
-    redoc_url="/redoc" if DEBUG else None
+    docs_url="/docs",
+    redoc_url="/redoc"
 )
 
 # Enable CORS for frontend integration
@@ -582,42 +573,17 @@ async def general_exception_handler(request, exc):
     )
 
 
-# Initialize models on startup
-@app.on_event("startup")
-async def startup_event():
-    """Initialize models and system on startup."""
-    logger.info("Starting FSOC Link Optimization API...")
-    
-    # Load pre-trained models if they exist
-    models_dir = Path("models")
-    if models_dir.exists():
-        try:
-            import sys
-            sys.path.append(str(Path.cwd()))
-            from train_models import load_models_into_manager
-            load_models_into_manager()
-            logger.info("Pre-trained models loaded successfully")
-        except Exception as e:
-            logger.warning(f"Could not load pre-trained models: {e}")
-    else:
-        logger.warning("Models directory not found, optimization features may be limited")
-
-
 # Run the server
 if __name__ == "__main__":
     import uvicorn
     
-    port = int(os.getenv("PORT", 8000))
-    
     print("Starting FSOC Link Optimization API...")
-    print(f"Environment: {ENVIRONMENT}")
-    if DEBUG:
-        print(f"Documentation available at: http://localhost:{port}/docs")
+    print("Documentation available at: http://localhost:8000/docs")
     
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
-        port=port,
-        reload=DEBUG,
+        port=8000,
+        reload=True,
         log_level="info"
     )

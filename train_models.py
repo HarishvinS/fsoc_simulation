@@ -28,19 +28,8 @@ def train_models():
     # Path to training data
     data_path = Path(__file__).parent / "backend" / "data" / "fsoc_training_dataset_500samples.csv"
     
-    # Generate training data if it doesn't exist
     if not data_path.exists():
-        logger.info("Training data not found, generating...")
-        from backend.simulation.engine import create_training_dataset
-        try:
-            create_training_dataset(num_samples=500)
-            logger.info("Training data generated successfully")
-        except Exception as e:
-            logger.error(f"Failed to generate training data: {e}")
-            return False
-    
-    if not data_path.exists():
-        logger.error(f"Training data still not found at {data_path}")
+        logger.error(f"Training data not found at {data_path}")
         return False
     
     # Load training data
