@@ -1,12 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}LightLink - System Health{% endblock %}
+{% block title %}System Health{% endblock %}
+{% block page_title %}System Health{% endblock %}
 
 {% block content %}
-<h1 class="page-title">System Health</h1>
-
 {% if error %}
-    <div class="alert alert-error">
+    <div class="alert alert-danger mb-6">
         <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
         </svg>
@@ -14,14 +13,25 @@
     </div>
     
     <div class="card">
-        <div style="text-align: center; padding: 48px;">
-            <div style="font-size: 4rem; margin-bottom: 24px;">🔌</div>
-            <h3 style="margin-bottom: 16px;">Backend API Unavailable</h3>
-            <p style="color: #666; margin-bottom: 32px;">The backend API server may not be running. Please start the API server to enable full functionality.</p>
-            <div style="background: #f5f5f5; padding: 16px; border-radius: 8px; margin-bottom: 24px; font-family: monospace;">
-                python start_backend.py
+        <div class="card-header">
+            <h3 class="card-title">
+                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                Backend API Unavailable
+            </h3>
+        </div>
+        <div class="text-center">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">🔌</div>
+            <h4 class="mb-4">Backend API Unavailable</h4>
+            <p class="text-secondary mb-6">The backend API server may not be running. Please start the API server to enable full functionality.</p>
+            <div style="background: var(--bg-secondary); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; font-family: monospace;">
+                python start_api.py
             </div>
             <button class="btn btn-primary" onclick="location.reload()">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path>
+                </svg>
                 Retry Connection
             </button>
         </div>
@@ -29,56 +39,123 @@
 
 {% elif health %}
     <!-- Overall Status -->
-    <div class="card" style="margin-bottom: 32px;">
-        <div style="text-align: center; padding: 48px;">
+    <div class="card mb-6">
+        <div class="card-header">
+            <h3 class="card-title">
+                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Overall System Status
+            </h3>
+        </div>
+        <div class="text-center">
             {% if health.status == 'healthy' %}
-                <div style="font-size: 4rem; margin-bottom: 24px;">✅</div>
-                <h3 style="color: #22c55e; margin-bottom: 8px;">System Healthy</h3>
-                <p style="color: #666;">All systems operational</p>
+                <div style="font-size: 4rem; margin-bottom: 1rem;">✅</div>
+                <h4 style="color: var(--accent-success);">System Healthy</h4>
+                <p class="text-secondary">All systems operational</p>
             {% else %}
-                <div style="font-size: 4rem; margin-bottom: 24px;">⚠️</div>
-                <h3 style="color: #f59e0b; margin-bottom: 8px;">System Degraded</h3>
-                <p style="color: #666;">Some components may not be fully operational</p>
+                <div style="font-size: 4rem; margin-bottom: 1rem;">⚠️</div>
+                <h4 style="color: var(--accent-warning);">System Degraded</h4>
+                <p class="text-secondary">Some components may not be fully operational</p>
             {% endif %}
-            <small style="color: #999;">Last checked: {{ health.timestamp }}</small>
+            <small class="text-muted">Last checked: {{ health.timestamp }}</small>
         </div>
     </div>
 
     <!-- Component Status -->
-    <div class="grid grid-2">
+    <div class="grid grid-cols-2 mb-6">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">API Information</h3>
+                <h3 class="card-title">
+                    <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path>
+                    </svg>
+                    API Information
+                </h3>
             </div>
-            <div class="data-table">
-                <div class="data-row">
-                    <span class="data-label">API Version</span>
-                    <span class="data-value">{{ health.api_version }}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Active Tasks</span>
-                    <span class="data-value">{{ health.system_info.active_tasks }}</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Status</span>
-                    <span class="data-value" style="color: #22c55e;">Online</span>
-                </div>
-            </div>
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td>API Version</td>
+                        <td><span class="badge badge-success">{{ health.api_version }}</span></td>
+                    </tr>
+                    <tr>
+                        <td>Active Tasks</td>
+                        <td><span class="badge badge-success">{{ health.system_info.active_tasks }}</span></td>
+                    </tr>
+                    <tr>
+                        <td>Status</td>
+                        <td><span class="badge badge-success">Online</span></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
         
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">ML Model Status</h3>
+                <h3 class="card-title">
+                    <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    ML Model Status
+                </h3>
             </div>
-            <div class="data-table">
-                {% for model_name, is_loaded in health.models_loaded.items() %}
-                <div class="data-row">
-                    <span class="data-label">{{ model_name|title|replace('_', ' ') }}</span>
-                    <span class="data-value" style="color: {% if is_loaded %}#22c55e{% else %}#ef4444{% endif %};">
-                        {% if is_loaded %}Ready{% else %}Not Ready{% endif %}
-                    </span>
-                </div>
-                {% endfor %}
+            <table class="table">
+                <tbody>
+                    {% for model_name, is_loaded in health.models_loaded.items() %}
+                    <tr>
+                        <td>{{ model_name|title|replace('_', ' ') }}</td>
+                        <td>
+                            {% if is_loaded %}
+                                <span class="badge badge-success">Ready</span>
+                            {% else %}
+                                <span class="badge badge-danger">Not Ready</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Feature Availability -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                </svg>
+                Feature Availability
+            </h3>
+        </div>
+        <div class="grid grid-cols-3 gap-4">
+            <div class="text-center">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📡</div>
+                <h5>Link Simulation</h5>
+                {% if health.models_loaded.simulation_engine %}
+                    <span class="badge badge-success">Available</span>
+                {% else %}
+                    <span class="badge badge-danger">Unavailable</span>
+                {% endif %}
+            </div>
+            <div class="text-center">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🤖</div>
+                <h5>AI Optimization</h5>
+                {% if health.models_loaded.power_predictors %}
+                    <span class="badge badge-success">Available</span>
+                {% else %}
+                    <span class="badge badge-danger">Unavailable</span>
+                {% endif %}
+            </div>
+            <div class="text-center">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🌤️</div>
+                <h5>Weather Data</h5>
+                {% if health.models_loaded.weather_api %}
+                    <span class="badge badge-success">Available</span>
+                {% else %}
+                    <span class="badge badge-danger">Unavailable</span>
+                {% endif %}
             </div>
         </div>
     </div>

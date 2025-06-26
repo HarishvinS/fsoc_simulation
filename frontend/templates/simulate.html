@@ -1,16 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}LightLink - Simulate{% endblock %}
+{% block title %}FSOC Simulation{% endblock %}
+{% block page_title %}Link Simulation{% endblock %}
 
 {% block content %}
-<h1 class="page-title">
-    Simulate link between<br>
-    two points.
-</h1>
-
 <form method="POST" action="/simulate" id="simulationForm">
-    <!-- Transmitter and Receiver -->
-    <div class="grid grid-2">
+    <!-- Link Configuration -->
+    <div class="grid grid-cols-2 mb-6">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">
@@ -21,25 +17,25 @@
                 </h3>
             </div>
             
-            <div class="form-row">
+            <div class="grid grid-cols-2 gap-4 mb-4">
                 <div class="form-group">
-                    <label class="form-label">Latitude</label>
-                    <input type="number" step="0.0001" class="form-input" name="lat_tx" required min="-90" max="90" value="37.7749" placeholder="37.7749">
+                    <label class="form-label">Latitude (°)</label>
+                    <input type="number" step="0.0001" class="form-control" name="lat_tx" required min="-90" max="90" value="37.7749">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Longitude</label>
-                    <input type="number" step="0.0001" class="form-input" name="lon_tx" required min="-180" max="180" value="-122.4194" placeholder="-122.4194">
+                    <label class="form-label">Longitude (°)</label>
+                    <input type="number" step="0.0001" class="form-control" name="lon_tx" required min="-180" max="180" value="-122.4194">
                 </div>
             </div>
             
-            <div class="form-row">
+            <div class="grid grid-cols-2 gap-4">
                 <div class="form-group">
-                    <label class="form-label">Mount Height (m)</label>
-                    <input type="number" step="0.1" class="form-input" name="height_tx" required min="1" max="1000" value="20" placeholder="20">
+                    <label class="form-label">Height (m)</label>
+                    <input type="number" step="0.1" class="form-control" name="height_tx" required min="1" max="1000" value="20">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Mount Material</label>
-                    <select class="form-select" name="material_tx" required>
+                    <select class="form-control form-select" name="material_tx" required>
                         <option value="white_paint" selected>White Paint</option>
                         <option value="black_paint">Black Paint</option>
                         <option value="aluminum">Aluminum</option>
@@ -61,28 +57,28 @@
                 </h3>
             </div>
             
-            <div class="form-row">
+            <div class="grid grid-cols-2 gap-4 mb-4">
                 <div class="form-group">
-                    <label class="form-label">Latitude</label>
-                    <input type="number" step="0.0001" class="form-input" name="lat_rx" required min="-90" max="90" value="37.7849" placeholder="37.7849">
+                    <label class="form-label">Latitude (°)</label>
+                    <input type="number" step="0.0001" class="form-control" name="lat_rx" required min="-90" max="90" value="37.7849">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Longitude</label>
-                    <input type="number" step="0.0001" class="form-input" name="lon_rx" required min="-180" max="180" value="-122.4094" placeholder="-122.4094">
+                    <label class="form-label">Longitude (°)</label>
+                    <input type="number" step="0.0001" class="form-control" name="lon_rx" required min="-180" max="180" value="-122.4094">
                 </div>
             </div>
             
-            <div class="form-row">
+            <div class="grid grid-cols-2 gap-4">
                 <div class="form-group">
-                    <label class="form-label">Mount Height (m)</label>
-                    <input type="number" step="0.1" class="form-input" name="height_rx" required min="1" max="1000" value="20" placeholder="20">
+                    <label class="form-label">Height (m)</label>
+                    <input type="number" step="0.1" class="form-control" name="height_rx" required min="1" max="1000" value="15">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Mount Material</label>
-                    <select class="form-select" name="material_rx" required>
-                        <option value="white_paint" selected>White Paint</option>
+                    <select class="form-control form-select" name="material_rx" required>
+                        <option value="white_paint">White Paint</option>
                         <option value="black_paint">Black Paint</option>
-                        <option value="aluminum">Aluminum</option>
+                        <option value="aluminum" selected>Aluminum</option>
                         <option value="steel">Steel</option>
                         <option value="concrete">Concrete</option>
                         <option value="wood">Wood</option>
@@ -92,89 +88,123 @@
         </div>
     </div>
 
-    <!-- Environmental Conditions and System Parameters -->
-    <div class="grid grid-2">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
-                    </svg>
-                    Environmental Conditions
-                </h3>
-                <div style="display: flex; gap: 12px; align-items: center;">
-                    <select class="form-select" name="weather_source" id="weatherSource" onchange="toggleWeatherInputs()" style="width: auto; min-width: 180px;">
-                        <option value="manual">Real Weather Data</option>
-                        <option value="real">Manual Input</option>
-                    </select>
-                    <button type="button" class="btn btn-secondary" onclick="testWeatherAPI()" id="testWeatherBtn" style="padding: 12px 20px;">
-                        Test API
-                    </button>
-                </div>
+    <!-- Weather Data Source -->
+    <div class="card mb-6">
+        <div class="card-header">
+            <h3 class="card-title">
+                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+                </svg>
+                Weather Data Source
+            </h3>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="form-group">
+                <label class="form-label">Weather Data Source</label>
+                <select class="form-control form-select" name="weather_source" id="weatherSource" onchange="toggleWeatherInputs()">
+                    <option value="manual">Manual Input</option>
+                    <option value="real">Real Weather Data (OpenMeteo API)</option>
+                </select>
+                <small class="text-secondary">Choose between manual weather input or real-time weather data</small>
             </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Fog Density (g/m²)</label>
-                    <input type="number" step="0.1" class="form-input" name="fog_density" min="0" max="10" value="0.5" placeholder="0.5">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Rain Rate (mm/hr)</label>
-                    <input type="number" step="0.1" class="form-input" name="rain_rate" min="0" max="200" value="2.0" placeholder="2.0">
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Surface Temp (°C)</label>
-                    <input type="number" step="0.1" class="form-input" name="surface_temp" min="-40" max="80" value="20" placeholder="20">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Ambient Temp (°C)</label>
-                    <input type="number" step="0.1" class="form-input" name="ambient_temp" min="-40" max="60" value="18" placeholder="18">
-                </div>
+            <div class="form-group" id="weatherTestContainer" style="display: none;">
+                <label class="form-label">API Status</label>
+                <button type="button" class="btn btn-secondary" onclick="testWeatherAPI()" id="testWeatherBtn">
+                    Test Weather API
+                </button>
+                <div id="weatherTestResult" class="mt-2"></div>
             </div>
         </div>
-        
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
-                    System Parameters
-                </h3>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Light Wavelength (nm)</label>
-                    <select class="form-select" name="wavelength_nm">
-                        <option value="850">850 nm (Near-IR)</option>
-                        <option value="1310">1310 nm (O-band)</option>
-                        <option value="1550" selected>1550 nm (C-band)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Transmitter Power (dBm)</label>
-                    <input type="number" step="0.1" class="form-input" name="tx_power_dbm" min="-10" max="50" value="20" placeholder="20">
-                </div>
-            </div>
-            
+
+        <div id="realWeatherInfo" style="display: none;" class="alert alert-info">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+            </svg>
+            Real weather data will be automatically fetched from OpenMeteo API using the transmitter location coordinates. This provides current atmospheric conditions including temperature, humidity, precipitation, and visibility.
+        </div>
+    </div>
+
+    <!-- Environmental Conditions -->
+    <div class="card mb-6" id="manualWeatherCard">
+        <div class="card-header">
+            <h3 class="card-title">
+                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+                </svg>
+                Environmental Conditions
+            </h3>
+        </div>
+
+        <div class="grid grid-cols-4 gap-4">
             <div class="form-group">
-                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-                    <input type="checkbox" name="detailed_output" style="width: 20px; height: 20px; accent-color: #000000;">
-                    <span class="checkbox-label">Include layer analysis</span>
+                <label class="form-label">Fog Density (g/m³)</label>
+                <input type="number" step="0.1" class="form-control" name="fog_density" min="0" max="10" value="0.5">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Rain Rate (mm/hr)</label>
+                <input type="number" step="0.1" class="form-control" name="rain_rate" min="0" max="200" value="2.0">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Surface Temp (°C)</label>
+                <input type="number" step="0.1" class="form-control" name="surface_temp" min="-40" max="80" value="25">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Ambient Temp (°C)</label>
+                <input type="number" step="0.1" class="form-control" name="ambient_temp" min="-40" max="60" value="20">
+            </div>
+        </div>
+    </div>
+
+    <!-- System Parameters -->
+    <div class="card mb-6">
+        <div class="card-header">
+            <h3 class="card-title">
+                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                System Parameters
+            </h3>
+        </div>
+        
+        <div class="grid grid-cols-3 gap-4">
+            <div class="form-group">
+                <label class="form-label">Wavelength (nm)</label>
+                <select class="form-control form-select" name="wavelength_nm">
+                    <option value="850">850 nm (Near-IR)</option>
+                    <option value="1310">1310 nm (O-band)</option>
+                    <option value="1550" selected>1550 nm (C-band)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Transmitter Power (dBm)</label>
+                <input type="number" step="0.1" class="form-control" name="tx_power_dbm" min="-10" max="50" value="20">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Analysis Detail</label>
+                <label style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem;">
+                    <input type="checkbox" name="detailed_output" style="margin: 0;">
+                    <span>Include layer analysis</span>
                 </label>
             </div>
         </div>
     </div>
 
-    <!-- Action Buttons -->
-    <div class="btn-group">
-        <button type="reset" class="btn btn-secondary">Reset everything</button>
-        <button type="submit" class="btn btn-primary" id="submitBtn">Run Simulation</button>
+    <!-- Actions -->
+    <div class="flex justify-between">
+        <button type="reset" class="btn btn-secondary">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path>
+            </svg>
+            Reset
+        </button>
+        <button type="submit" class="btn btn-primary" id="submitBtn">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+            </svg>
+            Run Simulation
+        </button>
     </div>
 </form>
 {% endblock %}
@@ -194,46 +224,81 @@ document.getElementById('simulationForm').addEventListener('submit', function(e)
     this.appendChild(hiddenField);
 
     const btn = document.getElementById('submitBtn');
-    btn.innerHTML = '<div class="spinner"></div>Running...';
+    btn.innerHTML = '<div class="loading-spinner"></div> Running...';
     btn.disabled = true;
 });
 
 // Toggle weather input visibility
 function toggleWeatherInputs() {
-    // Implementation for weather input toggling
+    const weatherSource = document.getElementById('weatherSource').value;
+    const manualCard = document.getElementById('manualWeatherCard');
+    const realWeatherInfo = document.getElementById('realWeatherInfo');
+    const testContainer = document.getElementById('weatherTestContainer');
+    const weatherInputs = manualCard.querySelectorAll('input');
+
+    if (weatherSource === 'real') {
+        manualCard.style.display = 'none';
+        realWeatherInfo.style.display = 'block';
+        testContainer.style.display = 'block';
+
+        // Remove required attribute from manual inputs
+        weatherInputs.forEach(input => {
+            input.removeAttribute('required');
+        });
+    } else {
+        manualCard.style.display = 'block';
+        realWeatherInfo.style.display = 'none';
+        testContainer.style.display = 'none';
+
+        // Add required attribute to manual inputs
+        weatherInputs.forEach(input => {
+            input.setAttribute('required', 'required');
+        });
+    }
 }
 
 // Test weather API connectivity
 async function testWeatherAPI() {
     const btn = document.getElementById('testWeatherBtn');
-    btn.innerHTML = '<div class="spinner"></div>Testing...';
+    const resultDiv = document.getElementById('weatherTestResult');
+
+    btn.innerHTML = '<div class="loading-spinner"></div> Testing...';
     btn.disabled = true;
 
     try {
         const response = await fetch('/api/weather/test');
         const data = await response.json();
-        
+
         if (data.success) {
-            btn.innerHTML = 'API Connected';
-            btn.style.background = '#22c55e';
-            btn.style.color = 'white';
+            const testResults = data.test_results;
+            let resultHtml = '<div class="mt-2">';
+
+            if (testResults.api_connection && testResults.api_connection.success) {
+                resultHtml += '<div class="badge badge-success mb-1">✓ OpenMeteo API: Connected</div>';
+            } else {
+                resultHtml += '<div class="badge badge-danger mb-1">✗ OpenMeteo API: Failed</div>';
+            }
+
+            if (testResults.mock_api && testResults.mock_api.success) {
+                resultHtml += '<div class="badge badge-success mb-1">✓ Mock API: Available</div>';
+            }
+
+            resultHtml += '</div>';
+            resultDiv.innerHTML = resultHtml;
         } else {
-            btn.innerHTML = 'API Failed';
-            btn.style.background = '#ef4444';
-            btn.style.color = 'white';
+            resultDiv.innerHTML = '<div class="badge badge-danger">API test failed</div>';
         }
     } catch (error) {
-        btn.innerHTML = 'Connection Error';
-        btn.style.background = '#ef4444';
-        btn.style.color = 'white';
+        resultDiv.innerHTML = '<div class="badge badge-danger">Connection error</div>';
     }
 
-    setTimeout(() => {
-        btn.innerHTML = 'Test API';
-        btn.style.background = '';
-        btn.style.color = '';
-        btn.disabled = false;
-    }, 2000);
+    btn.innerHTML = 'Test Weather API';
+    btn.disabled = false;
 }
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    toggleWeatherInputs();
+});
 </script>
 {% endblock %}
