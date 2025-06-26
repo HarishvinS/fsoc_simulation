@@ -5,7 +5,7 @@ Defines Pydantic models for validating user inputs including
 geographic coordinates, environmental conditions, and system parameters.
 """
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional, Literal
 from enum import Enum
 import math
@@ -36,11 +36,37 @@ class EnvironmentInput(BaseModel):
     height_rx: float = Field(..., ge=1, le=1000, description="Receiver mounting height in meters")
     material_rx: MaterialType = Field(..., description="Receiver mount surface material")
     
-    # Atmospheric conditions
-    fog_density: float = Field(..., ge=0, le=10, description="Fog water content in g/m³")
-    rain_rate: float = Field(..., ge=0, le=200, description="Rain rate in mm/hr")
-    surface_temp: float = Field(..., ge=-40, le=80, description="Surface temperature in °C")
-    ambient_temp: float = Field(..., ge=-40, le=60, description="Ambient air temperature in °C")
+    # Weather data options
+    use_real_weather: bool = Field(
+        default=False,
+        description="Whether to fetch real weather data from OpenMeteo API"
+    )
+
+    # Atmospheric conditions (optional when using real weather data)
+    fog_density: Optional[float] = Field(
+        default=None,
+        ge=0,
+        le=10,
+        description="Fog water content in g/m³ (required if use_real_weather=False)"
+    )
+    rain_rate: Optional[float] = Field(
+        default=None,
+        ge=0,
+        le=200,
+        description="Rain rate in mm/hr (required if use_real_weather=False)"
+    )
+    surface_temp: Optional[float] = Field(
+        default=None,
+        ge=-40,
+        le=80,
+        description="Surface temperature in °C (required if use_real_weather=False)"
+    )
+    ambient_temp: Optional[float] = Field(
+        default=None,
+        ge=-40,
+        le=60,
+        description="Ambient air temperature in °C (required if use_real_weather=False)"
+    )
     
     # System parameters
     wavelength_nm: float = Field(
@@ -56,25 +82,43 @@ class EnvironmentInput(BaseModel):
         description="Transmitter power in dBm"
     )
     
-    @validator('surface_temp', 'ambient_temp')
-    def validate_temperature_relationship(cls, v, values):
+    @field_validator('fog_density', 'rain_rate', 'surface_temp', 'ambient_temp')
+    @classmethod
+    def validate_weather_data_requirements(cls, v, info):
+        """Ensure weather data is provided when not using real weather API."""
+        if info.data:
+            use_real_weather = info.data.get('use_real_weather', False)
+
+            if not use_real_weather and v is None:
+                raise ValueError(f"{info.field_name} is required when use_real_weather=False")
+
+        return v
+
+    @field_validator('surface_temp')
+    @classmethod
+    def validate_temperature_relationship(cls, v, info):
         """Ensure surface temperature is physically reasonable relative to ambient."""
-        if 'ambient_temp' in values:
-            ambient = values['ambient_temp']
+        if v is not None and info.data and 'ambient_temp' in info.data and info.data['ambient_temp'] is not None:
+            ambient = info.data['ambient_temp']
             # Surface can be warmer than ambient but not excessively colder
             if v < ambient - 10:
                 raise ValueError(f"Surface temperature {v}°C is unrealistically low compared to ambient {ambient}°C")
         return v
-    
-    @validator('lat_rx', 'lon_rx')
-    def validate_rx_location(cls, v, values):
+
+    @field_validator('lat_rx', 'lon_rx')
+    @classmethod
+    def validate_rx_location(cls, v, info):
         """Ensure transmitter and receiver are not at identical locations."""
-        if 'lat_tx' in values and 'lon_tx' in values:
-            lat_tx, lon_tx = values['lat_tx'], values['lon_tx']
-            if values.get('lat_tx') is not None and values.get('lon_tx') is not None:
+        if info.data and 'lat_tx' in info.data and 'lon_tx' in info.data:
+            lat_tx, lon_tx = info.data['lat_tx'], info.data['lon_tx']
+            if lat_tx is not None and lon_tx is not None:
                 # Calculate approximate distance
-                if abs(v - lat_tx) < 0.0001 and abs(values.get('lon_rx', 0) - lon_tx) < 0.0001:
-                    raise ValueError("Transmitter and receiver cannot be at the same location")
+                if info.field_name == 'lat_rx':
+                    if abs(v - lat_tx) < 0.0001 and abs(info.data.get('lon_rx', 0) - lon_tx) < 0.0001:
+                        raise ValueError("Transmitter and receiver cannot be at the same location")
+                elif info.field_name == 'lon_rx':
+                    if abs(info.data.get('lat_rx', 0) - lat_tx) < 0.0001 and abs(v - lon_tx) < 0.0001:
+                        raise ValueError("Transmitter and receiver cannot be at the same location")
         return v
     
     def link_distance_km(self) -> float:
@@ -147,6 +191,7 @@ EXAMPLE_URBAN_LINK = EnvironmentInput(
     height_tx=20, height_rx=15,
     material_tx=MaterialType.WHITE_PAINT,
     material_rx=MaterialType.ALUMINUM,
+    use_real_weather=False,
     fog_density=0.5, rain_rate=2.0,
     surface_temp=25, ambient_temp=20,
     wavelength_nm=1550, tx_power_dbm=20
@@ -158,7 +203,18 @@ EXAMPLE_RURAL_LINK = EnvironmentInput(
     height_tx=50, height_rx=45,
     material_tx=MaterialType.STEEL,
     material_rx=MaterialType.STEEL,
+    use_real_weather=False,
     fog_density=0.1, rain_rate=5.0,
     surface_temp=30, ambient_temp=25,
     wavelength_nm=1550, tx_power_dbm=25
+)
+
+EXAMPLE_REAL_WEATHER_LINK = EnvironmentInput(
+    lat_tx=37.7749, lon_tx=-122.4194,  # San Francisco
+    lat_rx=37.7849, lon_rx=-122.4094,  # 1km away
+    height_tx=20, height_rx=15,
+    material_tx=MaterialType.WHITE_PAINT,
+    material_rx=MaterialType.ALUMINUM,
+    use_real_weather=True,
+    wavelength_nm=1550, tx_power_dbm=20
 )

@@ -74,26 +74,34 @@ def simulate():
     if request.method == 'POST':
         # Extract form data
         try:
+            # Check if using real weather data
+            use_real_weather = request.form.get('use_real_weather', 'false').lower() == 'true'
+
             # Create environment input from form data
             env_data = {
                 "lat_tx": float(request.form['lat_tx']),
                 "lon_tx": float(request.form['lon_tx']),
                 "height_tx": float(request.form['height_tx']),
                 "material_tx": request.form['material_tx'],
-                
+
                 "lat_rx": float(request.form['lat_rx']),
                 "lon_rx": float(request.form['lon_rx']),
                 "height_rx": float(request.form['height_rx']),
                 "material_rx": request.form['material_rx'],
-                
-                "fog_density": float(request.form['fog_density']),
-                "rain_rate": float(request.form['rain_rate']),
-                "surface_temp": float(request.form['surface_temp']),
-                "ambient_temp": float(request.form['ambient_temp']),
-                
+
+                "use_real_weather": use_real_weather,
                 "wavelength_nm": float(request.form.get('wavelength_nm', 1550)),
                 "tx_power_dbm": float(request.form.get('tx_power_dbm', 20))
             }
+
+            # Add manual weather data only if not using real weather
+            if not use_real_weather:
+                env_data.update({
+                    "fog_density": float(request.form['fog_density']),
+                    "rain_rate": float(request.form['rain_rate']),
+                    "surface_temp": float(request.form['surface_temp']),
+                    "ambient_temp": float(request.form['ambient_temp'])
+                })
             
             # Call backend API
             detailed_output = 'detailed_output' in request.form
@@ -215,6 +223,18 @@ def examples():
             
     except Exception as e:
         return render_template('index.html', error=str(e))
+
+@app.route('/api/weather/test')
+def test_weather_api():
+    """Test weather API connectivity."""
+    try:
+        response = api_request('get', "/weather/test")
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return {"success": False, "error": f"API Error: {response.status_code}"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

@@ -88,8 +88,45 @@
         </div>
     </div>
 
-    <!-- Environmental Conditions -->
+    <!-- Weather Data Source -->
     <div class="card mb-6">
+        <div class="card-header">
+            <h3 class="card-title">
+                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+                </svg>
+                Weather Data Source
+            </h3>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="form-group">
+                <label class="form-label">Weather Data Source</label>
+                <select class="form-control form-select" name="weather_source" id="weatherSource" onchange="toggleWeatherInputs()">
+                    <option value="manual">Manual Input</option>
+                    <option value="real">Real Weather Data (OpenMeteo API)</option>
+                </select>
+                <small class="text-secondary">Choose between manual weather input or real-time weather data</small>
+            </div>
+            <div class="form-group" id="weatherTestContainer" style="display: none;">
+                <label class="form-label">API Status</label>
+                <button type="button" class="btn btn-secondary" onclick="testWeatherAPI()" id="testWeatherBtn">
+                    Test Weather API
+                </button>
+                <div id="weatherTestResult" class="mt-2"></div>
+            </div>
+        </div>
+
+        <div id="realWeatherInfo" style="display: none;" class="alert alert-info">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+            </svg>
+            Real weather data will be automatically fetched from OpenMeteo API using the transmitter location coordinates. This provides current atmospheric conditions including temperature, humidity, precipitation, and visibility.
+        </div>
+    </div>
+
+    <!-- Environmental Conditions -->
+    <div class="card mb-6" id="manualWeatherCard">
         <div class="card-header">
             <h3 class="card-title">
                 <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,23 +135,23 @@
                 Environmental Conditions
             </h3>
         </div>
-        
+
         <div class="grid grid-cols-4 gap-4">
             <div class="form-group">
                 <label class="form-label">Fog Density (g/m³)</label>
-                <input type="number" step="0.1" class="form-control" name="fog_density" required min="0" max="10" value="0.5">
+                <input type="number" step="0.1" class="form-control" name="fog_density" min="0" max="10" value="0.5">
             </div>
             <div class="form-group">
                 <label class="form-label">Rain Rate (mm/hr)</label>
-                <input type="number" step="0.1" class="form-control" name="rain_rate" required min="0" max="200" value="2.0">
+                <input type="number" step="0.1" class="form-control" name="rain_rate" min="0" max="200" value="2.0">
             </div>
             <div class="form-group">
                 <label class="form-label">Surface Temp (°C)</label>
-                <input type="number" step="0.1" class="form-control" name="surface_temp" required min="-40" max="80" value="25">
+                <input type="number" step="0.1" class="form-control" name="surface_temp" min="-40" max="80" value="25">
             </div>
             <div class="form-group">
                 <label class="form-label">Ambient Temp (°C)</label>
-                <input type="number" step="0.1" class="form-control" name="ambient_temp" required min="-40" max="60" value="20">
+                <input type="number" step="0.1" class="form-control" name="ambient_temp" min="-40" max="60" value="20">
             </div>
         </div>
     </div>
@@ -174,10 +211,94 @@
 
 {% block scripts %}
 <script>
-document.getElementById('simulationForm').addEventListener('submit', function() {
+// Handle form submission
+document.getElementById('simulationForm').addEventListener('submit', function(e) {
+    const weatherSource = document.getElementById('weatherSource').value;
+    const useRealWeather = weatherSource === 'real';
+
+    // Add hidden field for weather source
+    const hiddenField = document.createElement('input');
+    hiddenField.type = 'hidden';
+    hiddenField.name = 'use_real_weather';
+    hiddenField.value = useRealWeather;
+    this.appendChild(hiddenField);
+
     const btn = document.getElementById('submitBtn');
     btn.innerHTML = '<div class="loading-spinner"></div> Running...';
     btn.disabled = true;
+});
+
+// Toggle weather input visibility
+function toggleWeatherInputs() {
+    const weatherSource = document.getElementById('weatherSource').value;
+    const manualCard = document.getElementById('manualWeatherCard');
+    const realWeatherInfo = document.getElementById('realWeatherInfo');
+    const testContainer = document.getElementById('weatherTestContainer');
+    const weatherInputs = manualCard.querySelectorAll('input');
+
+    if (weatherSource === 'real') {
+        manualCard.style.display = 'none';
+        realWeatherInfo.style.display = 'block';
+        testContainer.style.display = 'block';
+
+        // Remove required attribute from manual inputs
+        weatherInputs.forEach(input => {
+            input.removeAttribute('required');
+        });
+    } else {
+        manualCard.style.display = 'block';
+        realWeatherInfo.style.display = 'none';
+        testContainer.style.display = 'none';
+
+        // Add required attribute to manual inputs
+        weatherInputs.forEach(input => {
+            input.setAttribute('required', 'required');
+        });
+    }
+}
+
+// Test weather API connectivity
+async function testWeatherAPI() {
+    const btn = document.getElementById('testWeatherBtn');
+    const resultDiv = document.getElementById('weatherTestResult');
+
+    btn.innerHTML = '<div class="loading-spinner"></div> Testing...';
+    btn.disabled = true;
+
+    try {
+        const response = await fetch('/api/weather/test');
+        const data = await response.json();
+
+        if (data.success) {
+            const testResults = data.test_results;
+            let resultHtml = '<div class="mt-2">';
+
+            if (testResults.api_connection && testResults.api_connection.success) {
+                resultHtml += '<div class="badge badge-success mb-1">✓ OpenMeteo API: Connected</div>';
+            } else {
+                resultHtml += '<div class="badge badge-danger mb-1">✗ OpenMeteo API: Failed</div>';
+            }
+
+            if (testResults.mock_api && testResults.mock_api.success) {
+                resultHtml += '<div class="badge badge-success mb-1">✓ Mock API: Available</div>';
+            }
+
+            resultHtml += '</div>';
+            resultDiv.innerHTML = resultHtml;
+        } else {
+            resultDiv.innerHTML = '<div class="badge badge-danger">API test failed</div>';
+        }
+    } catch (error) {
+        resultDiv.innerHTML = '<div class="badge badge-danger">Connection error</div>';
+    }
+
+    btn.innerHTML = 'Test Weather API';
+    btn.disabled = false;
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    toggleWeatherInputs();
 });
 </script>
 {% endblock %}

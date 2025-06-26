@@ -32,7 +32,7 @@ def start_backend():
     uvicorn.run(
         "backend.api.main:app",
         host="0.0.0.0",
-        port=8001,
+        port=8002,
         log_level="info"
     )
 

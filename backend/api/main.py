@@ -24,11 +24,12 @@ from pathlib import Path
 # Import our modules
 from ..ingest.input_schema import (
     EnvironmentInput, BatchSimulationInput, OptimizationRequest,
-    MaterialType, EXAMPLE_URBAN_LINK, EXAMPLE_RURAL_LINK
+    MaterialType, EXAMPLE_URBAN_LINK, EXAMPLE_RURAL_LINK, EXAMPLE_REAL_WEATHER_LINK
 )
 from ..simulation.engine import FSocSimulationEngine
 from ..optimizer.models import ModelManager, PowerPredictorModel
 from ..ingest.mock_weather import MockWeatherAPI
+from ..ingest.weather_mapper import WeatherDataMapper
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -54,7 +55,8 @@ app.add_middleware(
 
 # Global instances
 simulation_engine = FSocSimulationEngine()
-weather_api = MockWeatherAPI()
+weather_api = MockWeatherAPI()  # Keep for backward compatibility
+weather_mapper = WeatherDataMapper()
 model_manager = ModelManager()
 
 # Background task tracking
@@ -448,34 +450,63 @@ async def get_batch_status(task_id: str):
 
 
 @app.get("/weather/{lat}/{lon}")
-async def get_weather(lat: float, lon: float):
+async def get_weather(lat: float, lon: float, use_real_weather: bool = Query(default=True)):
     """Get current weather conditions for a location."""
     try:
-        weather = weather_api.get_current_weather(lat, lon)
+        weather_summary = simulation_engine.get_weather_for_location(lat, lon, use_real_weather)
         return {
             "success": True,
             "location": {"latitude": lat, "longitude": lon},
-            "weather": {
-                "timestamp": weather.timestamp,
-                "fog_density": weather.fog_density,
-                "rain_rate": weather.rain_rate,
-                "surface_temp": weather.surface_temp,
-                "ambient_temp": weather.ambient_temp,
-                "wind_speed": weather.wind_speed,
-                "humidity": weather.humidity,
-                "pressure": weather.pressure
-            }
+            "weather_source": "real_api" if use_real_weather else "mock",
+            "weather": weather_summary
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/weather/test")
+async def test_weather_connectivity():
+    """Test connectivity to weather data sources."""
+    try:
+        test_results = simulation_engine.test_weather_connectivity()
+        return {
+            "success": True,
+            "test_results": test_results
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/weather/sources")
+async def get_weather_sources():
+    """Get information about available weather data sources."""
+    return {
+        "success": True,
+        "sources": {
+            "mock": {
+                "name": "Mock Weather API",
+                "description": "Synthetic weather data for testing and development",
+                "requires_api_key": False,
+                "always_available": True
+            },
+            "openmeteo": {
+                "name": "OpenMeteo API",
+                "description": "Real weather data from OpenMeteo service",
+                "requires_api_key": False,
+                "website": "https://open-meteo.com",
+                "features": ["Current weather", "Forecasts", "Historical data"]
+            }
+        }
+    }
 
 
 @app.get("/examples")
 async def get_examples():
     """Get example configurations for testing."""
     return {
-        "urban_link": EXAMPLE_URBAN_LINK.dict(),
-        "rural_link": EXAMPLE_RURAL_LINK.dict(),
+        "urban_link": EXAMPLE_URBAN_LINK.model_dump(),
+        "rural_link": EXAMPLE_RURAL_LINK.model_dump(),
+        "real_weather_link": EXAMPLE_REAL_WEATHER_LINK.model_dump(),
         "materials": [material.value for material in MaterialType]
     }
 

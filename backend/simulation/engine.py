@@ -16,6 +16,7 @@ from pathlib import Path
 
 from ..ingest.input_schema import EnvironmentInput, MaterialType
 from ..ingest.mock_weather import MockWeatherAPI
+from ..ingest.weather_mapper import WeatherDataMapper
 from ..physics.layer import AtmosphereProfile
 from ..physics.propagation import BeamSimulator, BeamParameters
 from ..physics.constants import MATERIAL_PROPERTIES
@@ -30,25 +31,29 @@ class FSocSimulationEngine:
     """
     
     def __init__(self):
-        self.weather_api = MockWeatherAPI()
+        self.weather_api = MockWeatherAPI()  # Keep for backward compatibility
+        self.weather_mapper = WeatherDataMapper()
         self.simulation_cache = {}
         self.last_simulation_time = 0
         
-    def simulate_single_link(self, 
+    def simulate_single_link(self,
                            environment: EnvironmentInput,
                            detailed_output: bool = False) -> Dict[str, Any]:
         """
         Simulate a single FSOC link with given environment parameters.
-        
+
         Args:
             environment: Complete environment specification
             detailed_output: Include layer-by-layer results
-            
+
         Returns:
             Comprehensive simulation results dictionary
         """
         start_time = time.time()
-        
+
+        # Populate weather data if using real weather
+        environment = self.weather_mapper.populate_environment_with_weather(environment)
+
         # Calculate link geometry
         link_distance = environment.link_distance_km() * 1000  # Convert to meters
         
@@ -169,7 +174,37 @@ class FSocSimulationEngine:
             ]
         
         self.last_simulation_time = time.time() - start_time
+        # Add weather information to results
+        weather_condition = self.weather_mapper.get_weather_for_environment(environment)
+        results["weather_info"] = self.weather_mapper.get_weather_summary(weather_condition)
+        results["weather_source"] = "real_api" if environment.use_real_weather else "manual"
+
         return results
+
+    def test_weather_connectivity(self) -> Dict[str, Any]:
+        """
+        Test connectivity to weather data sources.
+
+        Returns:
+            Dictionary with connectivity test results
+        """
+        return self.weather_mapper.test_weather_sources()
+
+    def get_weather_for_location(self, lat: float, lon: float,
+                               use_real_weather: bool = True) -> Dict[str, Any]:
+        """
+        Get weather data for a specific location.
+
+        Args:
+            lat: Latitude in degrees
+            lon: Longitude in degrees
+            use_real_weather: Whether to use real weather data
+
+        Returns:
+            Weather data summary
+        """
+        weather = self.weather_mapper.get_weather_for_location(lat, lon, use_real_weather)
+        return self.weather_mapper.get_weather_summary(weather)
     
     def batch_simulate(self, 
                       parameter_ranges: Dict[str, List],
