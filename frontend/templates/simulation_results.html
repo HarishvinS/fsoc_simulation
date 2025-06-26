@@ -1,43 +1,38 @@
 {% extends "base.html" %}
 
-{% block title %}Simulation Results{% endblock %}
-{% block page_title %}Simulation Results{% endblock %}
+{% block title %}LightLink - Simulation Results{% endblock %}
 
 {% block content %}
 {% if result.success %}
-    <div class="alert alert-success mb-6">
-        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-        </svg>
-        Simulation completed in {{ "%.2f"|format(result.execution_time_seconds) }} seconds
-    </div>
-
-    <!-- Key Metrics -->
-    <div class="grid grid-cols-4 mb-6">
+    <!-- Top Metrics -->
+    <div class="grid grid-4" style="margin-bottom: 32px;">
         <div class="metric-card">
-            <div class="metric-icon">📡</div>
             <div class="metric-value">{{ "%.1f"|format(result.results.received_power_dbm) }}</div>
             <div class="metric-label">Received Power (dBm)</div>
         </div>
         <div class="metric-card">
-            <div class="metric-icon">📉</div>
             <div class="metric-value">{{ "%.1f"|format(result.results.total_loss_db) }}</div>
             <div class="metric-label">Total Loss (dB)</div>
         </div>
         <div class="metric-card">
-            <div class="metric-icon">🛡️</div>
             <div class="metric-value">{{ "%.1f"|format(result.results.link_margin_db) }}</div>
             <div class="metric-label">Link Margin (dB)</div>
         </div>
         <div class="metric-card">
-            <div class="metric-icon">{% if result.results.link_available %}✅{% else %}❌{% endif %}</div>
-            <div class="metric-value">{% if result.results.link_available %}VIABLE{% else %}FAILED{% endif %}</div>
-            <div class="metric-label">Link Status</div>
+            <div class="metric-status">
+                {% if result.results.link_available %}
+                    Viable Link
+                    <div class="status-icon">✓</div>
+                {% else %}
+                    Failed Link
+                    <div class="status-icon" style="background: #ef4444;">✗</div>
+                {% endif %}
+            </div>
         </div>
     </div>
 
     <!-- Detailed Analysis -->
-    <div class="grid grid-cols-2 mb-6">
+    <div class="grid grid-3">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">
@@ -59,126 +54,95 @@
                     Link Summary
                 </h3>
             </div>
-            <table class="table">
-                <tbody>
-                    <tr>
-                        <td>Distance</td>
-                        <td>{{ "%.2f"|format(result.results.link_distance_km) }} km</td>
-                    </tr>
-                    <tr>
-                        <td>Elevation</td>
-                        <td>{{ "%.2f"|format(result.results.elevation_angle_deg) }}°</td>
-                    </tr>
-                    <tr>
-                        <td>Wavelength</td>
-                        <td>{{ result.results.input_parameters.wavelength_nm }} nm</td>
-                    </tr>
-                    <tr>
-                        <td>Tx Power</td>
-                        <td>{{ result.results.input_parameters.tx_power_dbm }} dBm</td>
-                    </tr>
-                    <tr>
-                        <td>Availability</td>
-                        <td>{{ "%.1f"|format(result.results.estimated_availability * 100) }}%</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="data-table">
+                <div class="data-row">
+                    <span class="data-label">Distance</span>
+                    <span class="data-value">{{ "%.1f"|format(result.results.link_distance_km) }} km</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Elevation</span>
+                    <span class="data-value">{{ "%.2f"|format(result.results.elevation_angle_deg) }}°</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Wavelength</span>
+                    <span class="data-value">{{ result.results.input_parameters.wavelength_nm }} nm</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Tx Power</span>
+                    <span class="data-value">{{ result.results.input_parameters.tx_power_dbm }} dBm</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Availability</span>
+                    <span class="data-value">{{ "%.1f"|format(result.results.estimated_availability * 100) }}%</span>
+                </div>
+            </div>
         </div>
-    </div>
-
-    <!-- Environmental Conditions -->
-    <div class="card mb-6">
-        <div class="card-header">
-            <h3 class="card-title">
-                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
-                </svg>
-                Environmental Conditions
-                {% if result.results.weather_source %}
-                <span class="badge badge-{{ 'success' if result.results.weather_source == 'real_api' else 'secondary' }} ml-2">
-                    {{ 'Real Weather Data' if result.results.weather_source == 'real_api' else 'Manual Input' }}
-                </span>
+        
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+                    </svg>
+                    Environmental Conditions
+                </h3>
+            </div>
+            <div class="data-table">
+                {% if result.results.weather_info %}
+                    <div class="data-row">
+                        <span class="data-label">Temperature</span>
+                        <span class="data-value">{{ "%.1f"|format(result.results.weather_info.ambient_temp_c) }} °C</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Humidity</span>
+                        <span class="data-value">{{ "%.1f"|format(result.results.weather_info.humidity_percent) }}%</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Fog (g/m²)</span>
+                        <span class="data-value">{{ "%.3f"|format(result.results.weather_info.fog_density_g_m3) }}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Rain (mm/hr)</span>
+                        <span class="data-value">{{ "%.1f"|format(result.results.weather_info.rain_rate_mm_hr) }}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Wind Speed</span>
+                        <span class="data-value">{{ "%.1f"|format(result.results.weather_info.wind_speed_ms) }} m/s</span>
+                    </div>
+                {% else %}
+                    <div class="data-row">
+                        <span class="data-label">Temperature</span>
+                        <span class="data-value">{{ result.results.input_parameters.ambient_temp }} °C</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Humidity</span>
+                        <span class="data-value">60.0%</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Fog (g/m²)</span>
+                        <span class="data-value">{{ "%.3f"|format(result.results.input_parameters.fog_density) }}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Rain (mm/hr)</span>
+                        <span class="data-value">{{ "%.1f"|format(result.results.input_parameters.rain_rate) }}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Wind Speed</span>
+                        <span class="data-value">5.0 m/s</span>
+                    </div>
                 {% endif %}
-            </h3>
-        </div>
-
-        {% if result.results.weather_info %}
-        <!-- Weather Information from API -->
-        <div class="mb-4">
-            <div class="grid grid-cols-2 gap-4 mb-4">
-                <div class="text-center">
-                    <div class="metric-value" style="font-size: 1.5rem;">{{ "%.1f"|format(result.results.weather_info.ambient_temp_c) }}°C</div>
-                    <div class="metric-label">{{ result.results.weather_info.temperature_description }} Temperature</div>
-                </div>
-                <div class="text-center">
-                    <div class="metric-value" style="font-size: 1.5rem;">{{ "%.1f"|format(result.results.weather_info.humidity_percent) }}%</div>
-                    <div class="metric-label">Humidity</div>
-                </div>
-            </div>
-            <div class="grid grid-cols-3 gap-4">
-                <div class="text-center">
-                    <div class="metric-value" style="font-size: 1.2rem;">{{ "%.3f"|format(result.results.weather_info.fog_density_g_m3) }}</div>
-                    <div class="metric-label">{{ result.results.weather_info.fog_description }}</div>
-                    <div class="text-xs text-secondary">Fog Density (g/m³)</div>
-                </div>
-                <div class="text-center">
-                    <div class="metric-value" style="font-size: 1.2rem;">{{ "%.1f"|format(result.results.weather_info.rain_rate_mm_hr) }}</div>
-                    <div class="metric-label">{{ result.results.weather_info.rain_description }}</div>
-                    <div class="text-xs text-secondary">Rain Rate (mm/hr)</div>
-                </div>
-                <div class="text-center">
-                    <div class="metric-value" style="font-size: 1.2rem;">{{ "%.1f"|format(result.results.weather_info.wind_speed_ms) }}</div>
-                    <div class="metric-label">Wind Speed</div>
-                    <div class="text-xs text-secondary">m/s</div>
-                </div>
-            </div>
-            {% if result.results.weather_info.timestamp %}
-            <div class="text-center mt-3">
-                <small class="text-secondary">Weather data from: {{ result.results.weather_info.timestamp[:19] }}</small>
-            </div>
-            {% endif %}
-        </div>
-        {% else %}
-        <!-- Manual Weather Input -->
-        <div class="grid grid-cols-4 gap-4">
-            <div class="text-center">
-                <div class="metric-value" style="font-size: 1.5rem;">{{ result.results.input_parameters.fog_density }}</div>
-                <div class="metric-label">Fog Density (g/m³)</div>
-            </div>
-            <div class="text-center">
-                <div class="metric-value" style="font-size: 1.5rem;">{{ result.results.input_parameters.rain_rate }}</div>
-                <div class="metric-label">Rain Rate (mm/hr)</div>
-            </div>
-            <div class="text-center">
-                <div class="metric-value" style="font-size: 1.5rem;">{{ result.results.input_parameters.surface_temp }}°C</div>
-                <div class="metric-label">Surface Temperature</div>
-            </div>
-            <div class="text-center">
-                <div class="metric-value" style="font-size: 1.5rem;">{{ result.results.input_parameters.ambient_temp }}°C</div>
-                <div class="metric-label">Ambient Temperature</div>
             </div>
         </div>
-        {% endif %}
     </div>
 
-    <!-- Actions -->
-    <div class="flex gap-4">
-        <a href="/simulate" class="btn btn-secondary">
-            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path>
-            </svg>
-            New Simulation
-        </a>
-        <a href="/optimize" class="btn btn-primary">
-            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path>
-            </svg>
-            Optimize This Link
-        </a>
+    <!-- Action Buttons -->
+    <div class="btn-group">
+        <a href="/simulate" class="btn btn-secondary">New Simulation</a>
+        <a href="/optimize" class="btn btn-primary">Optimize This Link</a>
     </div>
 
 {% else %}
-    <div class="alert alert-danger">
+    <div class="alert alert-error">
         <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
         </svg>
@@ -193,52 +157,15 @@
 document.addEventListener('DOMContentLoaded', function() {
     const results = {{ result.results | tojson }};
     
-    // Prepare loss breakdown data
-    const lossData = [];
-    const lossLabels = [];
-    const colors = ['#4f46e5', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'];
+    // Create a simple pie chart visualization
+    const chartDiv = document.getElementById('loss-chart');
     
-    if (results.loss_breakdown) {
-        let colorIndex = 0;
-        for (const [key, value] of Object.entries(results.loss_breakdown)) {
-            if (value > 0.01) {
-                lossLabels.push(key.replace('_loss_db', '').replace(/_/g, ' '));
-                lossData.push(value);
-                colorIndex++;
-            }
-        }
-    }
-    
-    // Create pie chart
-    const data = [{
-        values: lossData,
-        labels: lossLabels,
-        type: 'pie',
-        marker: {
-            colors: colors.slice(0, lossData.length)
-        },
-        textinfo: 'label+percent',
-        textposition: 'outside',
-        hovertemplate: '<b>%{label}</b><br>%{value:.2f} dB<br>%{percent}<extra></extra>'
-    }];
-    
-    const layout = {
-        margin: { t: 20, b: 20, l: 20, r: 20 },
-        showlegend: false,
-        paper_bgcolor: 'rgba(0,0,0,0)',
-        plot_bgcolor: 'rgba(0,0,0,0)',
-        font: {
-            family: 'Inter, sans-serif',
-            color: '#f8fafc'
-        }
-    };
-    
-    const config = {
-        responsive: true,
-        displayModeBar: false
-    };
-    
-    Plotly.newPlot('loss-chart', data, layout, config);
+    // For now, show a simple circular visualization
+    chartDiv.innerHTML = `
+        <div style="width: 200px; height: 200px; border-radius: 50%; background: #00d4aa; margin: 50px auto; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: 600;">
+            ${results.total_loss_db.toFixed(1)} dB
+        </div>
+    `;
 });
 </script>
 {% endif %}

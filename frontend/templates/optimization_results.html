@@ -1,43 +1,31 @@
 {% extends "base.html" %}
 
-{% block title %}Optimization Results{% endblock %}
-{% block page_title %}Optimization Results{% endblock %}
+{% block title %}LightLink - Optimization Results{% endblock %}
 
 {% block content %}
 {% if result.success %}
-    <div class="alert alert-success mb-6">
-        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-        </svg>
-        AI optimization completed with {{ "%.0f"|format(result.confidence_score * 100) }}% confidence
-    </div>
-
-    <!-- Confidence Score -->
-    <div class="card mb-6">
+    <!-- Optimization Confidence -->
+    <div class="card" style="margin-bottom: 32px;">
         <div class="card-header">
-            <h3 class="card-title">
-                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                </svg>
-                Optimization Confidence
-            </h3>
+            <h3 class="card-title">Optimization Confidence</h3>
         </div>
-        <div class="progress mb-4" style="height: 24px;">
-            <div class="progress-bar" style="width: {{ result.confidence_score * 100 }}%;"></div>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ result.confidence_score * 100 }}%;"></div>
         </div>
-        <p class="text-secondary">
+        <div class="progress-label">
+            {{ "%.0f"|format(result.confidence_score * 100) }}% - 
             {% if result.confidence_score >= 0.8 %}
-                High confidence - Recommended configuration should perform well
+                High Confidence - Recommended Configuration
             {% elif result.confidence_score >= 0.5 %}
-                Moderate confidence - Consider additional analysis
+                Low Confidence - Challenging Conditions
             {% else %}
-                Low confidence - Challenging conditions detected
+                Low Confidence - Challenging Conditions
             {% endif %}
-        </p>
+        </div>
     </div>
 
-    <!-- Recommended Configuration -->
-    <div class="grid grid-cols-2 mb-6">
+    <!-- Recommended Configuration and Expected Performance -->
+    <div class="grid grid-2">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">
@@ -48,22 +36,19 @@
                     Recommended Configuration
                 </h3>
             </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div class="text-center">
-                    <div class="metric-value" style="font-size: 1.5rem;">{{ "%.1f"|format(result.recommendations.tx_height_m) }}m</div>
-                    <div class="metric-label">Tx Height</div>
+            
+            <div class="grid grid-2" style="gap: 32px;">
+                <div style="text-align: center; padding: 24px; background: #f8f8f8; border-radius: 12px;">
+                    <div style="font-size: 32px; font-weight: 700; margin-bottom: 8px;">{{ "%.1f"|format(result.recommendations.tx_height_m) }}</div>
+                    <div style="font-size: 14px; color: #666; margin-bottom: 16px;">Tx Height</div>
+                    <div style="font-size: 18px; font-weight: 600;">{{ result.recommendations.tx_material|title|replace('_', ' ') }}</div>
+                    <div style="font-size: 14px; color: #666;">Tx Material</div>
                 </div>
-                <div class="text-center">
-                    <div class="metric-value" style="font-size: 1.5rem;">{{ "%.1f"|format(result.recommendations.rx_height_m) }}m</div>
-                    <div class="metric-label">Rx Height</div>
-                </div>
-                <div class="text-center">
-                    <div class="metric-value" style="font-size: 1rem;">{{ result.recommendations.tx_material|title|replace('_', ' ') }}</div>
-                    <div class="metric-label">Tx Material</div>
-                </div>
-                <div class="text-center">
-                    <div class="metric-value" style="font-size: 1rem;">{{ result.recommendations.rx_material|title|replace('_', ' ') }}</div>
-                    <div class="metric-label">Rx Material</div>
+                <div style="text-align: center; padding: 24px; background: #f8f8f8; border-radius: 12px;">
+                    <div style="font-size: 32px; font-weight: 700; margin-bottom: 8px;">{{ "%.1f"|format(result.recommendations.rx_height_m) }}</div>
+                    <div style="font-size: 14px; color: #666; margin-bottom: 16px;">Rx Height</div>
+                    <div style="font-size: 18px; font-weight: 600;">{{ result.recommendations.rx_material|title|replace('_', ' ') }}</div>
+                    <div style="font-size: 14px; color: #666;">Rx Material</div>
                 </div>
             </div>
         </div>
@@ -77,74 +62,40 @@
                     Expected Performance
                 </h3>
             </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div class="text-center">
-                    <div class="metric-value" style="font-size: 1.5rem;">{{ "%.1f"|format(result.recommendations.expected_rx_power_dbm) }}</div>
-                    <div class="metric-label">Rx Power (dBm)</div>
+            
+            <div style="padding: 24px; background: #f8f8f8; border-radius: 12px;">
+                <div class="grid grid-2" style="gap: 24px; margin-bottom: 24px;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; font-weight: 700;">{{ "%.1f"|format(result.recommendations.expected_rx_power_dbm) }}</div>
+                        <div style="font-size: 14px; color: #666;">Rx Power (dBm)</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; font-weight: 700;">{{ "%.1f"|format(result.recommendations.link_margin_db) }}</div>
+                        <div style="font-size: 14px; color: #666;">Link Margin (dB)</div>
+                    </div>
                 </div>
-                <div class="text-center">
-                    <div class="metric-value" style="font-size: 1.5rem;">{{ "%.1f"|format(result.recommendations.link_margin_db) }}</div>
-                    <div class="metric-label">Link Margin (dB)</div>
-                </div>
-                <div class="text-center">
-                    <div class="metric-value" style="font-size: 1.5rem;">{{ "%.1f"|format(result.recommendations.expected_reliability * 100) }}%</div>
-                    <div class="metric-label">Reliability</div>
-                </div>
-                <div class="text-center">
-                    <div class="metric-value" style="font-size: 1.5rem;">{{ "%.0f"|format(result.recommendations.optimization_score) }}</div>
-                    <div class="metric-label">Score</div>
+                <div class="grid grid-2" style="gap: 24px;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; font-weight: 700;">{{ "%.1f"|format(result.recommendations.link_margin_db) }}</div>
+                        <div style="font-size: 14px; color: #666;">Link Margin (dB)</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; font-weight: 700;">{{ "%.0f"|format(result.recommendations.expected_reliability * 100) }}%</div>
+                        <div style="font-size: 14px; color: #666;">Optimization Score</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Actions -->
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">
-                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                </svg>
-                Next Steps
-            </h3>
-        </div>
-        <p class="text-secondary mb-4">Validate these recommendations by running a detailed simulation with the optimized parameters.</p>
-        
-        <form method="POST" action="/simulate" style="display: inline;">
-            <input type="hidden" name="lat_tx" value="{{ result.recommendations.lat_tx }}">
-            <input type="hidden" name="lon_tx" value="{{ result.recommendations.lon_tx }}">
-            <input type="hidden" name="height_tx" value="{{ result.recommendations.tx_height_m }}">
-            <input type="hidden" name="material_tx" value="{{ result.recommendations.tx_material }}">
-            <input type="hidden" name="lat_rx" value="{{ result.recommendations.lat_rx }}">
-            <input type="hidden" name="lon_rx" value="{{ result.recommendations.lon_rx }}">
-            <input type="hidden" name="height_rx" value="{{ result.recommendations.rx_height_m }}">
-            <input type="hidden" name="material_rx" value="{{ result.recommendations.rx_material }}">
-            <input type="hidden" name="fog_density" value="{{ result.recommendations.avg_fog_density }}">
-            <input type="hidden" name="rain_rate" value="{{ result.recommendations.avg_rain_rate }}">
-            <input type="hidden" name="surface_temp" value="{{ result.recommendations.avg_surface_temp }}">
-            <input type="hidden" name="ambient_temp" value="{{ result.recommendations.avg_ambient_temp }}">
-            <input type="hidden" name="wavelength_nm" value="{{ result.recommendations.wavelength_nm }}">
-            <input type="hidden" name="tx_power_dbm" value="{{ result.recommendations.tx_power_dbm }}">
-            <input type="hidden" name="detailed_output" value="true">
-            
-            <button type="submit" class="btn btn-primary">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
-                </svg>
-                Run Detailed Simulation
-            </button>
-        </form>
-        
-        <a href="/optimize" class="btn btn-secondary ml-4">
-            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path>
-            </svg>
-            New Optimization
-        </a>
+    <!-- Action Buttons -->
+    <div class="btn-group">
+        <a href="/optimize" class="btn btn-secondary">New Optimization</a>
+        <a href="/simulate" class="btn btn-primary">Run Detailed Simulation</a>
     </div>
 
 {% else %}
-    <div class="alert alert-danger">
+    <div class="alert alert-error">
         <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
         </svg>
