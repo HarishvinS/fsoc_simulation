@@ -18,11 +18,11 @@
             </div>
             <div class="progress-description">
                 {% if result.confidence_score >= 0.8 %}
-                    Low Confidence - Challenging Conditions
+                    High Confidence - Recommended configuration should perform well
                 {% elif result.confidence_score >= 0.5 %}
                     Moderate Confidence - Consider additional analysis
                 {% else %}
-                    High Confidence - Recommended configuration should perform well
+                    Low Confidence - Challenging conditions, proceed with caution
                 {% endif %}
             </div>
         </div>

@@ -45,11 +45,27 @@ app = FastAPI(
 )
 
 # Enable CORS for frontend integration
+# Configure CORS based on environment
+import os
+ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
+ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "*").split(",")
+
+if ENVIRONMENT == "production":
+    # More restrictive CORS for production
+    allowed_origins = [
+        "https://*.onrender.com",
+        "https://localhost:*",
+        "http://localhost:*"
+    ] + ALLOWED_ORIGINS
+else:
+    # Allow all for development
+    allowed_origins = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure appropriately for production
+    allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -365,8 +381,42 @@ async def optimize_deployment(
         recommendations['avg_surface_temp'] = base_conditions.get('input_surface_temp')
         recommendations['avg_ambient_temp'] = base_conditions.get('input_ambient_temp')
         
-        # Calculate confidence score (simplified)
-        confidence_score = float(min(1.0, recommendations.get('optimization_score', 0) / 100))
+        # Calculate confidence score based on optimization quality
+        predicted_power = recommendations.get('predicted_power_dbm', -50)
+        optimization_score = recommendations.get('optimization_score', predicted_power)
+
+        # Calculate confidence based on multiple factors:
+        # 1. How good the predicted power is (higher power = higher confidence)
+        # 2. How much better this is than a baseline configuration
+        # 3. Environmental conditions difficulty
+
+        # Power quality factor (0-1, where -10dBm = 1.0, -50dBm = 0.0)
+        power_factor = max(0.0, min(1.0, (predicted_power + 50) / 40))
+
+        # Environmental difficulty factor (higher fog/rain = lower confidence)
+        fog_density = base_conditions.get('input_fog_density', 0.1)
+        rain_rate = base_conditions.get('input_rain_rate', 2.0)
+        env_difficulty = min(1.0, (fog_density * 2 + rain_rate * 0.1))  # Normalize to 0-1
+        env_factor = max(0.2, 1.0 - env_difficulty)  # Keep minimum 20% confidence
+
+        # Link distance factor (longer links = lower confidence)
+        lat1, lon1 = base_conditions.get('input_lat_tx', 0), base_conditions.get('input_lon_tx', 0)
+        lat2, lon2 = base_conditions.get('input_lat_rx', 0), base_conditions.get('input_lon_rx', 0)
+        import math
+        lat1_rad, lon1_rad = math.radians(lat1), math.radians(lon1)
+        lat2_rad, lon2_rad = math.radians(lat2), math.radians(lon2)
+        dlat = lat2_rad - lat1_rad
+        dlon = lon2_rad - lon1_rad
+        a = (math.sin(dlat/2)**2 +
+             math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon/2)**2)
+        c = 2 * math.asin(math.sqrt(a))
+        link_distance_km = 6371.0 * c
+        distance_factor = max(0.3, 1.0 - (link_distance_km / 50))  # 50km = 30% confidence
+
+        # Combined confidence score
+        confidence_score = float(power_factor * env_factor * distance_factor)
+        confidence_score = max(0.1, min(1.0, confidence_score))  # Clamp between 10% and 100%
+
         recommendations['expected_reliability'] = min(1.0, max(0.5, confidence_score))
         
         logger.info(f"Optimization {optimization_id} completed")

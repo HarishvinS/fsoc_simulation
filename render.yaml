@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: fsoc-optimization
+    env: python
+    plan: free  # Change to 'starter' or higher for production
+    buildCommand: "./build.sh"
+    startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: "/health"
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: PYTHONPATH
+        value: /opt/render/project/src
+      - key: PYTHONDONTWRITEBYTECODE
+        value: "1"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+    # Optional: Add custom domains
+    # domains:
+    #   - your-domain.com
+    
+    # Optional: Add environment variables for API keys
+    # envVars:
+    #   - key: WEATHER_API_KEY
+    #     sync: false  # This will be a secret
+    #   - key: GOOGLE_ELEVATION_API_KEY
+    #     sync: false  # This will be a secret

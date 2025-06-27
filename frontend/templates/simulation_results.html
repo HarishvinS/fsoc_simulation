@@ -170,12 +170,31 @@
             </svg>
             New Simulation
         </a>
-        <a href="/optimize" class="btn btn-primary">
-            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path>
-            </svg>
-            Optimize This Link
-        </a>
+        <form method="GET" action="/optimize" style="display: inline;">
+            <input type="hidden" name="lat_tx" value="{{ result.results.input_parameters.lat_tx }}">
+            <input type="hidden" name="lon_tx" value="{{ result.results.input_parameters.lon_tx }}">
+            <input type="hidden" name="lat_rx" value="{{ result.results.input_parameters.lat_rx }}">
+            <input type="hidden" name="lon_rx" value="{{ result.results.input_parameters.lon_rx }}">
+            {% if result.results.weather_info %}
+            <!-- Use real weather data if available -->
+            <input type="hidden" name="avg_fog_density" value="{{ result.results.weather_info.fog_density_g_m3 }}">
+            <input type="hidden" name="avg_rain_rate" value="{{ result.results.weather_info.rain_rate_mm_hr }}">
+            <input type="hidden" name="avg_surface_temp" value="{{ result.results.weather_info.ambient_temp_c }}">
+            <input type="hidden" name="avg_ambient_temp" value="{{ result.results.weather_info.ambient_temp_c }}">
+            {% else %}
+            <!-- Use manual input values -->
+            <input type="hidden" name="avg_fog_density" value="{{ result.results.input_parameters.fog_density }}">
+            <input type="hidden" name="avg_rain_rate" value="{{ result.results.input_parameters.rain_rate }}">
+            <input type="hidden" name="avg_surface_temp" value="{{ result.results.input_parameters.surface_temp }}">
+            <input type="hidden" name="avg_ambient_temp" value="{{ result.results.input_parameters.ambient_temp }}">
+            {% endif %}
+            <button type="submit" class="btn btn-primary">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path>
+                </svg>
+                Optimize This Link
+            </button>
+        </form>
     </div>
 
     {% else %}

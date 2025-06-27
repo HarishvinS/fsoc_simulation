@@ -16,8 +16,9 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# Configuration
-API_BASE_URL = "http://localhost:8002"  # FastAPI backend URL
+# Configuration - Use environment variables for production
+API_BASE_URL = os.environ.get("API_BASE_URL", "http://localhost:8002")
+ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
 
 # Check backend connection on startup
 def check_backend_connection():
@@ -163,8 +164,22 @@ def optimize():
         except Exception as e:
             return render_template('optimize.html', error=str(e))
     
-    # GET request - show form
-    return render_template('optimize.html')
+    # GET request - show form, potentially with pre-populated values
+    # Check if parameters were passed from simulation results
+    prefill_data = {}
+    if request.args.get('lat_tx'):
+        prefill_data = {
+            'lat_tx': request.args.get('lat_tx'),
+            'lon_tx': request.args.get('lon_tx'),
+            'lat_rx': request.args.get('lat_rx'),
+            'lon_rx': request.args.get('lon_rx'),
+            'avg_fog_density': request.args.get('avg_fog_density'),
+            'avg_rain_rate': request.args.get('avg_rain_rate'),
+            'avg_surface_temp': request.args.get('avg_surface_temp'),
+            'avg_ambient_temp': request.args.get('avg_ambient_temp'),
+        }
+
+    return render_template('optimize.html', prefill=prefill_data)
 
 @app.route('/health')
 def health():

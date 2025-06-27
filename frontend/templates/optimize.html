@@ -22,11 +22,11 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div class="form-group">
                         <label class="form-label">Latitude</label>
-                        <input type="number" step="0.0001" class="form-control" name="lat_tx" required min="-90" max="90" value="37.7749" placeholder="37.7749">
+                        <input type="number" step="0.0001" class="form-control" name="lat_tx" required min="-90" max="90" value="{{ prefill.lat_tx or '37.7749' }}" placeholder="37.7749">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Longitude</label>
-                        <input type="number" step="0.0001" class="form-control" name="lon_tx" required min="-180" max="180" value="-122.4194" placeholder="-122.4194">
+                        <input type="number" step="0.0001" class="form-control" name="lon_tx" required min="-180" max="180" value="{{ prefill.lon_tx or '-122.4194' }}" placeholder="-122.4194">
                     </div>
                 </div>
             </div>
@@ -44,11 +44,11 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div class="form-group">
                         <label class="form-label">Latitude</label>
-                        <input type="number" step="0.0001" class="form-control" name="lat_rx" required min="-90" max="90" value="37.7849" placeholder="37.7849">
+                        <input type="number" step="0.0001" class="form-control" name="lat_rx" required min="-90" max="90" value="{{ prefill.lat_rx or '37.7849' }}" placeholder="37.7849">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Longitude</label>
-                        <input type="number" step="0.0001" class="form-control" name="lon_rx" required min="-180" max="180" value="-122.4094" placeholder="-122.4094">
+                        <input type="number" step="0.0001" class="form-control" name="lon_rx" required min="-180" max="180" value="{{ prefill.lon_rx or '-122.4094' }}" placeholder="-122.4094">
                     </div>
                 </div>
             </div>
@@ -68,19 +68,19 @@
             <div class="grid grid-cols-4 gap-4">
                 <div class="form-group">
                     <label class="form-label">Fog Density (g/m²)</label>
-                    <input type="number" step="0.1" class="form-control" name="avg_fog_density" min="0" max="5" value="0.5" placeholder="0.5">
+                    <input type="number" step="0.1" class="form-control" name="avg_fog_density" min="0" max="5" value="{{ prefill.avg_fog_density or '0.5' }}" placeholder="0.5">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Rain Rate (mm/hr)</label>
-                    <input type="number" step="0.1" class="form-control" name="avg_rain_rate" min="0" max="50" value="2.0" placeholder="2.0">
+                    <input type="number" step="0.1" class="form-control" name="avg_rain_rate" min="0" max="50" value="{{ prefill.avg_rain_rate or '2.0' }}" placeholder="2.0">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Surface Temp (°C)</label>
-                    <input type="number" step="0.1" class="form-control" name="avg_surface_temp" min="-20" max="60" value="20" placeholder="20">
+                    <input type="number" step="0.1" class="form-control" name="avg_surface_temp" min="-20" max="60" value="{{ prefill.avg_surface_temp or '20' }}" placeholder="20">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Ambient Temp (°C)</label>
-                    <input type="number" step="0.1" class="form-control" name="avg_ambient_temp" min="-30" max="50" value="18" placeholder="18">
+                    <input type="number" step="0.1" class="form-control" name="avg_ambient_temp" min="-30" max="50" value="{{ prefill.avg_ambient_temp or '18' }}" placeholder="18">
                 </div>
             </div>
         </div>

@@ -33,5 +33,13 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
-# Default command
-CMD ["python", "-m", "backend.api.main"]
+# Train models during build if they don't exist
+RUN python -c "import os; from pathlib import Path; \
+    models_dir = Path('models'); \
+    rf_exists = (models_dir / 'power_predictor_random_forest.pkl').exists(); \
+    xgb_exists = (models_dir / 'power_predictor_xgboost.pkl').exists(); \
+    print(f'RF model exists: {rf_exists}, XGB model exists: {xgb_exists}'); \
+    exec(open('train_models.py').read()) if not (rf_exists and xgb_exists) else print('Models already exist')" || echo "Model training failed, continuing..."
+
+# Default command - use the new main.py entry point
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
