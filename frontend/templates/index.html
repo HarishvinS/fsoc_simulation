@@ -1,153 +1,74 @@
 {% extends "base.html" %}
 
-{% block title %}FSOC Dashboard{% endblock %}
-{% block page_title %}Dashboard{% endblock %}
+{% block title %}LightLink{% endblock %}
 
 {% block content %}
 
-<!-- Quick Actions -->
-<div class="grid grid-cols-2 mb-6">
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">
-                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                </svg>
-                Link Simulation
-            </h3>
-        </div>
-        <p class="text-secondary mb-4">Predict FSOC link performance under specific environmental conditions with atmospheric modeling.</p>
-        <a href="/simulate" class="btn btn-primary">
-            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
-            </svg>
-            Start Simulation
-        </a>
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="hero-image">
+        <img src="{{ url_for('static', filename='images/taara.jpg') }}" alt="Communication Tower" style="width: 100%; height: 100%; object-fit: cover;">
     </div>
-    
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">
-                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-                AI Optimization
-            </h3>
-        </div>
-        <p class="text-secondary mb-4">Get deployment recommendations using machine learning models</p>
-        <a href="/optimize" class="btn btn-primary">
-            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path>
-            </svg>
-            Start Optimization
-        </a>
-    </div>
-</div>
-
-<!-- System Status -->
-<div class="grid grid-cols-3 mb-6">
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">
-                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path>
-                </svg>
-                Backend API
-            </h3>
-        </div>
-        <div class="flex items-center justify-between">
-            <span class="text-secondary">Core simulation engine</span>
-            {% if backend_status %}
-            <span class="badge badge-success">
-                <div class="status-dot"></div>
-                Online
-            </span>
-            {% else %}
-            <span class="badge badge-danger">
-                <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent-danger);"></div>
-                Offline
-            </span>
-            {% endif %}
-        </div>
-    </div>
-    
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">
-                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                </svg>
-                ML Models
-            </h3>
-        </div>
-        <div class="flex items-center justify-between">
-            <span class="text-secondary">Prediction algorithms</span>
-            <span class="badge badge-success">
-                <div class="status-dot"></div>
-                Ready
-            </span>
-        </div>
-    </div>
-    
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">
-                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
-                </svg>
-                Weather Data
-            </h3>
-        </div>
-        <div class="flex items-center justify-between">
-            <span class="text-secondary">Environmental conditions</span>
-            <span class="badge badge-success">
-                <div class="status-dot"></div>
-                Active
-            </span>
+    <div class="hero-content">
+        <h1 class="hero-title">Simulate, optimize, and accelerate commercial FSOC deployment</h1>
+        <div class="hero-buttons">
+            <a href="/simulate" class="btn btn-secondary">Try now</a>
+            <a href="#learn-more" class="btn btn-secondary">Learn More</a>
         </div>
     </div>
 </div>
 
-<!-- Recent Activity -->
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title">
-            <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            Quick Start
-        </h3>
-    </div>
-    
-    <div class="grid grid-cols-2 gap-4">
-        <div class="card" style="background: var(--bg-secondary); border-color: var(--accent-primary);">
-            <div class="text-center">
-                <div style="width: 48px; height: 48px; margin: 0 auto 1rem; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">🏙️</div>
-                <h4 class="mb-2">Urban Link Example</h4>
-                <p class="text-secondary mb-4">San Francisco deployment with moderate fog conditions</p>
-                <a href="/examples?type=urban" class="btn btn-secondary">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
-                    </svg>
-                    Run Example
-                </a>
-            </div>
-        </div>
-        
-        <div class="card" style="background: var(--bg-secondary); border-color: var(--accent-success);">
-            <div class="text-center">
-                <div style="width: 48px; height: 48px; margin: 0 auto 1rem; background: linear-gradient(135deg, var(--accent-success), #059669); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">🌲</div>
-                <h4 class="mb-2">Rural Link Example</h4>
-                <p class="text-secondary mb-4">Long-distance rural deployment with rain conditions</p>
-                <a href="/examples?type=rural" class="btn btn-secondary">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
-                    </svg>
-                    Run Example
-                </a>
+<!-- Learn More Section -->
+<div id="learn-more" class="content-area" style="padding-top: 4rem; padding-bottom: 4rem;">
+    <div style="max-width: 800px; margin: 0 auto; text-align: left;">
+        <h2 style="font-size: 2rem; font-weight: 400; margin-bottom: 2rem; color: var(--text-primary); line-height: 1.1em;">
+            Helping Accelerate<br>Free Space Optical<br>Communication
+        </h2>
+
+        <div style="font-size: 1.125rem; line-height: 1.8; color: var(--text-secondary); text-align: left;">
+            <p style="margin-bottom: 1.5rem;">
+                Hey! My name's <a href="https://harishvin.framer.website/">Harishvin Sasikumar</a> and I'm the highschool student who built this tool! I call it LightLink and it's designed to help with the deployment of Free Space Optical Communication (FSOC) systems. The simulation and optimization tools help engineers and researchers predict link performance, optimize deployment configurations, and accelerate the deployment of high-speed optical wireless communication in various environments.
+            </p>
+
+            <p style="margin-bottom: 1.5rem;">
+                Using atmospheric modeling and machine learning, LightLink analyzes environmental conditions, terrain factors, and system parameters to provide accurate performance predictions and deployment recommendations. Whether you're planning urban deployments through fog and atmospheric turbulence or rural long-distance links, LightLink provides the insights you need.
+            </p>
+
+            <p style="margin-bottom: 1.5rem;">
+                I'd really appreciate your feedback. If you have any, please email me at<br><a href="mailto:harishsasi17@gmail.com">harishsasi17@gmail.com</a>. 
+            </p>
+
+            <p style="margin-bottom: 2rem;">
+                Hope you find it useful :) Get started by clicking on one of these buttons below.
+            </p>
+
+            <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+                <a href="/simulate" class="btn btn-primary">Start Simulating</a>
+                <a href="/optimize" class="btn btn-secondary">Optimize Deployment</a>
             </div>
         </div>
     </div>
 </div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Smooth scrolling for anchor links
+document.addEventListener('DOMContentLoaded', function() {
+    const learnMoreBtn = document.querySelector('a[href="#learn-more"]');
+    if (learnMoreBtn) {
+        learnMoreBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector('#learn-more');
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    }
+});
+</script>
 {% endblock %}
