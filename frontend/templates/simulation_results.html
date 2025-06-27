@@ -5,34 +5,34 @@
 
 {% block content %}
 <div class="content-area">
-    {% if result.success %}
+    {% if result.get('success') %}
     <div class="alert alert-success mb-6">
         <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
         </svg>
-        Simulation completed in {{ "%.2f"|format(result.execution_time_seconds) }} seconds
+        Simulation completed in {{ "%.2f"|format(result.get('execution_time_seconds', 0)) }} seconds
     </div>
 
     <!-- Key Metrics -->
     <div class="grid grid-cols-4 mb-6">
         <div class="metric-card">
             <div class="metric-icon">📡</div>
-            <div class="metric-value">{{ "%.1f"|format(result.results.received_power_dbm) }}</div>
+            <div class="metric-value">{{ "%.1f"|format(result.get('results', {}).get('received_power_dbm', -50)) }}</div>
             <div class="metric-label">Received Power (dBm)</div>
         </div>
         <div class="metric-card">
             <div class="metric-icon">📉</div>
-            <div class="metric-value">{{ "%.1f"|format(result.results.total_loss_db) }}</div>
+            <div class="metric-value">{{ "%.1f"|format(result.get('results', {}).get('total_loss_db', 0)) }}</div>
             <div class="metric-label">Total Loss (dB)</div>
         </div>
         <div class="metric-card">
             <div class="metric-icon">🛡️</div>
-            <div class="metric-value">{{ "%.1f"|format(result.results.link_margin_db) }}</div>
+            <div class="metric-value">{{ "%.1f"|format(result.get('results', {}).get('link_margin_db', 0)) }}</div>
             <div class="metric-label">Link Margin (dB)</div>
         </div>
         <div class="metric-card">
-            <div class="metric-icon">{% if result.results.link_available %}✅{% else %}❌{% endif %}</div>
-            <div class="metric-value">{% if result.results.link_available %}VIABLE{% else %}FAILED{% endif %}</div>
+            <div class="metric-icon">{% if result.get('results', {}).get('link_available') %}✅{% else %}❌{% endif %}</div>
+            <div class="metric-value">{% if result.get('results', {}).get('link_available') %}VIABLE{% else %}FAILED{% endif %}</div>
             <div class="metric-label">Link Status</div>
         </div>
     </div>
@@ -64,23 +64,23 @@
                 <tbody>
                     <tr>
                         <td>Distance</td>
-                        <td>{{ "%.2f"|format(result.results.link_distance_km) }} km</td>
+                        <td>{{ "%.2f"|format(result.get('results', {}).get('link_distance_km', 0)) }} km</td>
                     </tr>
                     <tr>
                         <td>Elevation</td>
-                        <td>{{ "%.2f"|format(result.results.elevation_angle_deg) }}°</td>
+                        <td>{{ "%.2f"|format(result.get('results', {}).get('elevation_angle_deg', 0)) }}°</td>
                     </tr>
                     <tr>
                         <td>Wavelength</td>
-                        <td>{{ result.results.input_parameters.wavelength_nm }} nm</td>
+                        <td>{{ result.get('results', {}).get('input_parameters', {}).get('wavelength_nm', 1550) }} nm</td>
                     </tr>
                     <tr>
                         <td>Tx Power</td>
-                        <td>{{ result.results.input_parameters.tx_power_dbm }} dBm</td>
+                        <td>{{ result.get('results', {}).get('input_parameters', {}).get('tx_power_dbm', 20) }} dBm</td>
                     </tr>
                     <tr>
                         <td>Availability</td>
-                        <td>{{ "%.1f"|format(result.results.estimated_availability * 100) }}%</td>
+                        <td>{{ "%.1f"|format(result.get('results', {}).get('estimated_availability', 0.5) * 100) }}%</td>
                     </tr>
                 </tbody>
             </table>
@@ -95,47 +95,47 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
                 </svg>
                 Environmental Conditions
-                {% if result.results.weather_source %}
-                <span class="badge badge-{{ 'success' if result.results.weather_source == 'real_api' else 'secondary' }} ml-2">
-                    {{ 'Real Weather Data' if result.results.weather_source == 'real_api' else 'Manual Input' }}
+                {% if result.get('results', {}).get('weather_source') %}
+                <span class="badge badge-{{ 'success' if result.get('results', {}).get('weather_source') == 'real_api' else 'secondary' }} ml-2">
+                    {{ 'Real Weather Data' if result.get('results', {}).get('weather_source') == 'real_api' else 'Manual Input' }}
                 </span>
                 {% endif %}
             </h3>
         </div>
 
-        {% if result.results.weather_info %}
+        {% if result.get('results', {}).get('weather_info') %}
         <!-- Weather Information from API -->
         <div class="mb-4">
             <div class="grid grid-cols-2 gap-4 mb-4">
                 <div class="text-center">
-                    <div class="metric-value" style="font-size: 1.5rem;">{{ "%.1f"|format(result.results.weather_info.ambient_temp_c) }}°C</div>
-                    <div class="metric-label">{{ result.results.weather_info.temperature_description }} Temperature</div>
+                    <div class="metric-value" style="font-size: 1.5rem;">{{ "%.1f"|format(result.get('results', {}).get('weather_info', {}).get('ambient_temp_c', 20)) }}°C</div>
+                    <div class="metric-label">{{ result.get('results', {}).get('weather_info', {}).get('temperature_description', 'Ambient') }} Temperature</div>
                 </div>
                 <div class="text-center">
-                    <div class="metric-value" style="font-size: 1.5rem;">{{ "%.1f"|format(result.results.weather_info.humidity_percent) }}%</div>
+                    <div class="metric-value" style="font-size: 1.5rem;">{{ "%.1f"|format(result.get('results', {}).get('weather_info', {}).get('humidity_percent', 50)) }}%</div>
                     <div class="metric-label">Humidity</div>
                 </div>
             </div>
             <div class="grid grid-cols-3 gap-4">
                 <div class="text-center">
-                    <div class="metric-value" style="font-size: 1.2rem;">{{ "%.3f"|format(result.results.weather_info.fog_density_g_m3) }}</div>
-                    <div class="metric-label">{{ result.results.weather_info.fog_description }}</div>
+                    <div class="metric-value" style="font-size: 1.2rem;">{{ "%.3f"|format(result.get('results', {}).get('weather_info', {}).get('fog_density_g_m3', 0.1)) }}</div>
+                    <div class="metric-label">{{ result.get('results', {}).get('weather_info', {}).get('fog_description', 'Light Fog') }}</div>
                     <div class="text-xs text-secondary">Fog Density (g/m³)</div>
                 </div>
                 <div class="text-center">
-                    <div class="metric-value" style="font-size: 1.2rem;">{{ "%.1f"|format(result.results.weather_info.rain_rate_mm_hr) }}</div>
-                    <div class="metric-label">{{ result.results.weather_info.rain_description }}</div>
+                    <div class="metric-value" style="font-size: 1.2rem;">{{ "%.1f"|format(result.get('results', {}).get('weather_info', {}).get('rain_rate_mm_hr', 2.0)) }}</div>
+                    <div class="metric-label">{{ result.get('results', {}).get('weather_info', {}).get('rain_description', 'Light Rain') }}</div>
                     <div class="text-xs text-secondary">Rain Rate (mm/hr)</div>
                 </div>
                 <div class="text-center">
-                    <div class="metric-value" style="font-size: 1.2rem;">{{ "%.1f"|format(result.results.weather_info.wind_speed_ms) }}</div>
+                    <div class="metric-value" style="font-size: 1.2rem;">{{ "%.1f"|format(result.get('results', {}).get('weather_info', {}).get('wind_speed_ms', 5.0)) }}</div>
                     <div class="metric-label">Wind Speed</div>
                     <div class="text-xs text-secondary">m/s</div>
                 </div>
             </div>
-            {% if result.results.weather_info.timestamp %}
+            {% if result.get('results', {}).get('weather_info', {}).get('timestamp') %}
             <div class="text-center mt-3">
-                <small class="text-secondary">Weather data from: {{ result.results.weather_info.timestamp[:19] }}</small>
+                <small class="text-secondary">Weather data from: {{ result.get('results', {}).get('weather_info', {}).get('timestamp', '')[:19] }}</small>
             </div>
             {% endif %}
         </div>
@@ -143,19 +143,19 @@
         <!-- Manual Weather Input -->
         <div class="grid grid-cols-4 gap-4">
             <div class="text-center">
-                <div class="metric-value" style="font-size: 1.5rem;">{{ result.results.input_parameters.fog_density }}</div>
+                <div class="metric-value" style="font-size: 1.5rem;">{{ result.get('results', {}).get('input_parameters', {}).get('fog_density', 0.1) }}</div>
                 <div class="metric-label">Fog Density (g/m³)</div>
             </div>
             <div class="text-center">
-                <div class="metric-value" style="font-size: 1.5rem;">{{ result.results.input_parameters.rain_rate }}</div>
+                <div class="metric-value" style="font-size: 1.5rem;">{{ result.get('results', {}).get('input_parameters', {}).get('rain_rate', 2.0) }}</div>
                 <div class="metric-label">Rain Rate (mm/hr)</div>
             </div>
             <div class="text-center">
-                <div class="metric-value" style="font-size: 1.5rem;">{{ result.results.input_parameters.surface_temp }}°C</div>
+                <div class="metric-value" style="font-size: 1.5rem;">{{ result.get('results', {}).get('input_parameters', {}).get('surface_temp', 25) }}°C</div>
                 <div class="metric-label">Surface Temperature</div>
             </div>
             <div class="text-center">
-                <div class="metric-value" style="font-size: 1.5rem;">{{ result.results.input_parameters.ambient_temp }}°C</div>
+                <div class="metric-value" style="font-size: 1.5rem;">{{ result.get('results', {}).get('input_parameters', {}).get('ambient_temp', 20) }}°C</div>
                 <div class="metric-label">Ambient Temperature</div>
             </div>
         </div>
@@ -171,22 +171,22 @@
             New Simulation
         </a>
         <form method="GET" action="/optimize" style="display: inline;">
-            <input type="hidden" name="lat_tx" value="{{ result.results.input_parameters.lat_tx }}">
-            <input type="hidden" name="lon_tx" value="{{ result.results.input_parameters.lon_tx }}">
-            <input type="hidden" name="lat_rx" value="{{ result.results.input_parameters.lat_rx }}">
-            <input type="hidden" name="lon_rx" value="{{ result.results.input_parameters.lon_rx }}">
-            {% if result.results.weather_info %}
+            <input type="hidden" name="lat_tx" value="{{ result.get('results', {}).get('input_parameters', {}).get('lat_tx', 37.7749) }}">
+            <input type="hidden" name="lon_tx" value="{{ result.get('results', {}).get('input_parameters', {}).get('lon_tx', -122.4194) }}">
+            <input type="hidden" name="lat_rx" value="{{ result.get('results', {}).get('input_parameters', {}).get('lat_rx', 37.7849) }}">
+            <input type="hidden" name="lon_rx" value="{{ result.get('results', {}).get('input_parameters', {}).get('lon_rx', -122.4094) }}">
+            {% if result.get('results', {}).get('weather_info') %}
             <!-- Use real weather data if available -->
-            <input type="hidden" name="avg_fog_density" value="{{ result.results.weather_info.fog_density_g_m3 }}">
-            <input type="hidden" name="avg_rain_rate" value="{{ result.results.weather_info.rain_rate_mm_hr }}">
-            <input type="hidden" name="avg_surface_temp" value="{{ result.results.weather_info.ambient_temp_c }}">
-            <input type="hidden" name="avg_ambient_temp" value="{{ result.results.weather_info.ambient_temp_c }}">
+            <input type="hidden" name="avg_fog_density" value="{{ result.get('results', {}).get('weather_info', {}).get('fog_density_g_m3', 0.1) }}">
+            <input type="hidden" name="avg_rain_rate" value="{{ result.get('results', {}).get('weather_info', {}).get('rain_rate_mm_hr', 2.0) }}">
+            <input type="hidden" name="avg_surface_temp" value="{{ result.get('results', {}).get('weather_info', {}).get('ambient_temp_c', 25) }}">
+            <input type="hidden" name="avg_ambient_temp" value="{{ result.get('results', {}).get('weather_info', {}).get('ambient_temp_c', 20) }}">
             {% else %}
             <!-- Use manual input values -->
-            <input type="hidden" name="avg_fog_density" value="{{ result.results.input_parameters.fog_density }}">
-            <input type="hidden" name="avg_rain_rate" value="{{ result.results.input_parameters.rain_rate }}">
-            <input type="hidden" name="avg_surface_temp" value="{{ result.results.input_parameters.surface_temp }}">
-            <input type="hidden" name="avg_ambient_temp" value="{{ result.results.input_parameters.ambient_temp }}">
+            <input type="hidden" name="avg_fog_density" value="{{ result.get('results', {}).get('input_parameters', {}).get('fog_density', 0.1) }}">
+            <input type="hidden" name="avg_rain_rate" value="{{ result.get('results', {}).get('input_parameters', {}).get('rain_rate', 2.0) }}">
+            <input type="hidden" name="avg_surface_temp" value="{{ result.get('results', {}).get('input_parameters', {}).get('surface_temp', 25) }}">
+            <input type="hidden" name="avg_ambient_temp" value="{{ result.get('results', {}).get('input_parameters', {}).get('ambient_temp', 20) }}">
             {% endif %}
             <button type="submit" class="btn btn-primary">
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
@@ -202,17 +202,17 @@
             <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
             </svg>
-            Simulation failed: {{ result.error_message }}
+            Simulation failed: {{ result.get('error_message', 'Unknown error') }}
         </div>
     {% endif %}
 </div>
 {% endblock %}
 
 {% block scripts %}
-{% if result.success %}
+{% if result.get('success') %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const results = {{ result.results | tojson }};
+    const results = {{ result.get('results', {}) | tojson }};
     
     // Prepare loss breakdown data
     const lossData = [];

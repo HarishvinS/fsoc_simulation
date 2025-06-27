@@ -119,11 +119,13 @@ def simulate():
             
             if response.status_code == 200:
                 result = response.json()
+                # Debug: Log the response structure
+                logger.info(f"Simulation API response: {result}")
                 return render_template('simulation_results.html', result=result)
             else:
                 error_msg = f"API Error: {response.status_code} - {response.text}"
                 return render_template('simulate.html', error=error_msg)
-                
+
         except Exception as e:
             return render_template('simulate.html', error=str(e))
     
