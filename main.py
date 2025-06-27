@@ -130,4 +130,7 @@ async def root_redirect():
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    logger.info(f"🚀 Starting FSOC system on port {port}")
+    logger.info("📱 Frontend available at: /")
+    logger.info("📚 API docs available at: /docs")
+    uvicorn.run(app, host="0.0.0.0", port=port, log_level="info")
