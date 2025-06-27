@@ -303,13 +303,17 @@ async def optimize_deployment(
     
     try:
         logger.info(f"Starting optimization {optimization_id}")
-        
+        logger.info(f"Request data: lat_tx={request.lat_tx}, lat_rx={request.lat_rx}")
+
         # Check if we have trained models
         if not manager.power_predictors:
+            logger.error("No trained prediction models available")
             raise HTTPException(
                 status_code=503,
                 detail="No trained prediction models available. Please train models first."
             )
+
+        logger.info(f"Available models: {list(manager.power_predictors.keys())}")
         
         # Create deployment optimizer
         optimizer = manager.create_deployment_optimizer()
