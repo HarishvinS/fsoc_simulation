@@ -3,6 +3,10 @@
 # Build script for Render deployment
 echo "🔧 Building FSOC Link Optimization System..."
 
+# Upgrade pip and setuptools first
+echo "⬆️ Upgrading build tools..."
+pip install --upgrade pip setuptools wheel
+
 # Install Python dependencies
 echo "📦 Installing dependencies..."
 pip install -r requirements.txt
