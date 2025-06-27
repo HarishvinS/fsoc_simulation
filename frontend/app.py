@@ -12,7 +12,11 @@ import requests
 import json
 import os
 import time
+import logging
 from datetime import datetime
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
@@ -156,13 +160,15 @@ def optimize():
             
             if response.status_code == 200:
                 result = response.json()
+                # Debug: Log the response structure
+                logger.info(f"Optimization API response: {result}")
                 return render_template('optimization_results.html', result=result)
             else:
                 error_msg = f"API Error: {response.status_code} - {response.text}"
-                return render_template('optimize.html', error=error_msg)
-                
+                return render_template('optimize.html', error=error_msg, prefill={})
+
         except Exception as e:
-            return render_template('optimize.html', error=str(e))
+            return render_template('optimize.html', error=str(e), prefill={})
     
     # GET request - show form, potentially with pre-populated values
     # Check if parameters were passed from simulation results
