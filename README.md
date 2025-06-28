@@ -181,16 +181,6 @@ git push origin main
 # See DEPLOYMENT.md for detailed instructions
 ```
 
-## Development Status
-
-- [x] Phase 0: Specification and setup
-- [x] Phase 1: Input layer and validation
-- [x] Phase 2: Beam physics engine
-- [x] Phase 3: Data generation and ML model training
-- [x] Phase 4: API and interfaces
-- [x] Phase 5: Frontend visualization
-- [ ] Phase 6: Real-world API integration
-
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
