@@ -82,11 +82,6 @@ start_app.bat  # Start with existing models
 start_with_training.bat  # Train models first, then start
 ```
 
-The application will be available at:
-- Frontend: http://localhost:5000
-- Backend API: http://localhost:8001
-- API Documentation: http://localhost:8001/docs
-
 ### Docker Deployment
 
 ```bash
