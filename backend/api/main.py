@@ -22,14 +22,15 @@ import traceback
 from pathlib import Path
 
 # Import our modules
-from ..ingest.input_schema import (
+from backend.ingest.input_schema import (
     EnvironmentInput, BatchSimulationInput, OptimizationRequest,
     MaterialType, EXAMPLE_URBAN_LINK, EXAMPLE_RURAL_LINK, EXAMPLE_REAL_WEATHER_LINK
 )
-from ..simulation.engine import FSocSimulationEngine
-from ..optimizer.models import ModelManager, PowerPredictorModel
-from ..ingest.mock_weather import MockWeatherAPI
-from ..ingest.weather_mapper import WeatherDataMapper
+from backend.simulation.engine import FSocSimulationEngine
+from backend.optimizer.models import ModelManager, PowerPredictorModel
+from backend.ingest.mock_weather import MockWeatherAPI
+from backend.ingest.weather_mapper import WeatherDataMapper
+from backend.risk.assessment import ComprehensiveRiskAssessment
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -74,6 +75,7 @@ simulation_engine = FSocSimulationEngine()
 weather_api = MockWeatherAPI()  # Keep for backward compatibility
 weather_mapper = WeatherDataMapper()
 model_manager = ModelManager()
+risk_assessor = ComprehensiveRiskAssessment()
 
 # Background task tracking
 active_tasks = {}
@@ -90,36 +92,23 @@ async def startup_event():
         models_dir = Path(__file__).parent.parent.parent / "models"
 
         # Check if model files exist
-        rf_model_path = models_dir / "power_predictor_random_forest.pkl"
-        xgb_model_path = models_dir / "power_predictor_xgboost.pkl"
-
+        model_types = ["neural_network", "random_forest", "xgboost"]
         models_loaded = 0
 
-        # Load Random Forest model if it exists
-        if rf_model_path.exists():
-            try:
-                rf_model = PowerPredictorModel("random_forest")
-                rf_model.load_model(str(rf_model_path))
-                model_manager.power_predictors["random_forest"] = rf_model
-                models_loaded += 1
-                logger.info("✓ Random Forest model loaded successfully")
-            except Exception as e:
-                logger.error(f"✗ Failed to load Random Forest model: {e}")
-        else:
-            logger.warning(f"✗ Random Forest model not found at {rf_model_path}")
+        for model_type in model_types:
+            model_path = models_dir / f"power_predictor_{model_type}.pkl"
 
-        # Load XGBoost model if it exists
-        if xgb_model_path.exists():
-            try:
-                xgb_model = PowerPredictorModel("xgboost")
-                xgb_model.load_model(str(xgb_model_path))
-                model_manager.power_predictors["xgboost"] = xgb_model
-                models_loaded += 1
-                logger.info("✓ XGBoost model loaded successfully")
-            except Exception as e:
-                logger.error(f"✗ Failed to load XGBoost model: {e}")
-        else:
-            logger.warning(f"✗ XGBoost model not found at {xgb_model_path}")
+            if model_path.exists():
+                try:
+                    model = PowerPredictorModel(model_type)
+                    model.load_model(str(model_path))
+                    model_manager.power_predictors[model_type] = model
+                    models_loaded += 1
+                    logger.info(f"✓ {model_type.replace('_', ' ').title()} model loaded successfully")
+                except Exception as e:
+                    logger.error(f"✗ Failed to load {model_type} model: {e}")
+            else:
+                logger.warning(f"✗ {model_type.replace('_', ' ').title()} model not found at {model_path}")
 
         if models_loaded > 0:
             logger.info(f"🎉 Successfully loaded {models_loaded} prediction models")
@@ -343,6 +332,10 @@ async def optimize_deployment(
             'available_materials': [m.value for m in request.available_materials],
             'min_received_power': request.min_received_power_dbm
         }
+
+        # Add constraints to base conditions for optimization algorithm
+        base_conditions['min_received_power'] = request.min_received_power_dbm
+        base_conditions['reliability_target'] = request.reliability_target
         
         # Run optimization
         recommendations = optimizer.optimize_deployment(
@@ -384,44 +377,130 @@ async def optimize_deployment(
         recommendations['avg_rain_rate'] = base_conditions.get('input_rain_rate')
         recommendations['avg_surface_temp'] = base_conditions.get('input_surface_temp')
         recommendations['avg_ambient_temp'] = base_conditions.get('input_ambient_temp')
-        
-        # Calculate confidence score based on optimization quality
+
+        # Perform comprehensive risk assessment
+        try:
+            location = {
+                'lat': base_conditions.get('input_lat_tx'),
+                'lon': base_conditions.get('input_lon_tx')
+            }
+
+            conditions = {
+                'fog_density': base_conditions.get('input_fog_density', 0.1),
+                'rain_rate': base_conditions.get('input_rain_rate', 2.0),
+                'surface_temp': base_conditions.get('input_surface_temp', 25.0),
+                'ambient_temp': base_conditions.get('input_ambient_temp', 20.0),
+                'avg_temp': (base_conditions.get('input_surface_temp', 25.0) +
+                           base_conditions.get('input_ambient_temp', 20.0)) / 2,
+                'humidity': 60  # Default humidity
+            }
+
+            equipment_config = {
+                'wavelength_nm': base_conditions.get('input_wavelength_nm', 1550),
+                'tx_power_dbm': base_conditions.get('input_tx_power_dbm', 20),
+                'height_tx': recommendations.get('height_tx', 20),
+                'height_rx': recommendations.get('height_rx', 20)
+            }
+
+            operational_factors = {
+                'link_distance_km': link_distance_km if 'link_distance_km' in locals() else 1.0,
+                'height_tx': recommendations.get('height_tx', 20),
+                'height_rx': recommendations.get('height_rx', 20),
+                'accessibility': 'normal'
+            }
+
+            risk_assessment = risk_assessor.assess_deployment_risk(
+                location=location,
+                conditions=conditions,
+                equipment_config=equipment_config,
+                operational_factors=operational_factors
+            )
+
+            # Add risk assessment to recommendations (excluding cost information)
+            recommendations['risk_assessment'] = {
+                'overall_risk_level': risk_assessment.overall_risk_level,
+                'overall_risk_score': float(risk_assessment.overall_risk_score),
+                'weather_risk_level': risk_assessment.weather_risk.risk_level,
+                'weather_risk_score': float(risk_assessment.weather_risk.risk_score),
+                'equipment_reliability_score': float(risk_assessment.equipment_risk.reliability_score),
+                'expected_availability': float(risk_assessment.combined_availability),
+                'mtbf_hours': float(risk_assessment.equipment_risk.mtbf_hours),
+                'annual_failure_rate': float(risk_assessment.equipment_risk.annual_failure_rate),
+                'maintenance_interval_months': risk_assessment.equipment_risk.maintenance_interval_months,
+                'risk_factors': risk_assessment.risk_factors,
+                'mitigation_strategies': risk_assessment.mitigation_strategies[:5],  # Top 5 strategies
+                'deployment_recommendations': risk_assessment.deployment_recommendations
+                # Removed cost_impact as it's redundant
+            }
+
+            # Use risk assessment for confidence calculation
+            risk_confidence = 1.0 - risk_assessment.overall_risk_score
+
+        except Exception as e:
+            logger.warning(f"Risk assessment failed: {e}")
+            # Fallback to basic confidence calculation
+            risk_confidence = 0.7
+            recommendations['risk_assessment'] = {
+                'overall_risk_level': 'medium',
+                'overall_risk_score': 0.3,
+                'error': 'Risk assessment unavailable'
+            }
+
+        # Calculate confidence score based on optimization quality and constraint satisfaction
         predicted_power = recommendations.get('predicted_power_dbm', -50)
-        optimization_score = recommendations.get('optimization_score', predicted_power)
+        constraints_met = recommendations.get('constraints_met', True)
 
-        # Calculate confidence based on multiple factors:
-        # 1. How good the predicted power is (higher power = higher confidence)
-        # 2. How much better this is than a baseline configuration
-        # 3. Environmental conditions difficulty
+        # Check if optimization found valid configurations
+        if not constraints_met or recommendations.get('warning'):
+            # Low confidence if constraints weren't met
+            confidence_score = 0.2
+            recommendations['expected_reliability'] = 0.5  # Conservative estimate
+            logger.warning(f"Optimization {optimization_id} found no configurations meeting all constraints")
+        else:
+            # Use the confidence level from the optimization if available
+            if 'confidence_level' in recommendations:
+                confidence_score = float(recommendations['confidence_level'])
+            else:
+                # Fallback confidence calculation
+                # Power quality factor (0-1, where -10dBm = 1.0, -50dBm = 0.0)
+                power_factor = max(0.0, min(1.0, (predicted_power + 50) / 40))
 
-        # Power quality factor (0-1, where -10dBm = 1.0, -50dBm = 0.0)
-        power_factor = max(0.0, min(1.0, (predicted_power + 50) / 40))
+                # Environmental difficulty factor (higher fog/rain = lower confidence)
+                fog_density = base_conditions.get('input_fog_density', 0.1)
+                rain_rate = base_conditions.get('input_rain_rate', 2.0)
+                env_difficulty = min(1.0, (fog_density * 2 + rain_rate * 0.1))  # Normalize to 0-1
+                env_factor = max(0.2, 1.0 - env_difficulty)  # Keep minimum 20% confidence
 
-        # Environmental difficulty factor (higher fog/rain = lower confidence)
-        fog_density = base_conditions.get('input_fog_density', 0.1)
-        rain_rate = base_conditions.get('input_rain_rate', 2.0)
-        env_difficulty = min(1.0, (fog_density * 2 + rain_rate * 0.1))  # Normalize to 0-1
-        env_factor = max(0.2, 1.0 - env_difficulty)  # Keep minimum 20% confidence
+                # Link distance factor (longer links = lower confidence)
+                lat1, lon1 = base_conditions.get('input_lat_tx', 0), base_conditions.get('input_lon_tx', 0)
+                lat2, lon2 = base_conditions.get('input_lat_rx', 0), base_conditions.get('input_lon_rx', 0)
+                import math
+                lat1_rad, lon1_rad = math.radians(lat1), math.radians(lon1)
+                lat2_rad, lon2_rad = math.radians(lat2), math.radians(lon2)
+                dlat = lat2_rad - lat1_rad
+                dlon = lon2_rad - lon1_rad
+                a = (math.sin(dlat/2)**2 +
+                     math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon/2)**2)
+                c = 2 * math.asin(math.sqrt(a))
+                link_distance_km = 6371.0 * c
+                distance_factor = max(0.3, 1.0 - (link_distance_km / 50))  # 50km = 30% confidence
 
-        # Link distance factor (longer links = lower confidence)
-        lat1, lon1 = base_conditions.get('input_lat_tx', 0), base_conditions.get('input_lon_tx', 0)
-        lat2, lon2 = base_conditions.get('input_lat_rx', 0), base_conditions.get('input_lon_rx', 0)
-        import math
-        lat1_rad, lon1_rad = math.radians(lat1), math.radians(lon1)
-        lat2_rad, lon2_rad = math.radians(lat2), math.radians(lon2)
-        dlat = lat2_rad - lat1_rad
-        dlon = lon2_rad - lon1_rad
-        a = (math.sin(dlat/2)**2 +
-             math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon/2)**2)
-        c = 2 * math.asin(math.sqrt(a))
-        link_distance_km = 6371.0 * c
-        distance_factor = max(0.3, 1.0 - (link_distance_km / 50))  # 50km = 30% confidence
+                # Combined confidence score
+                confidence_score = float(power_factor * env_factor * distance_factor)
 
-        # Combined confidence score
-        confidence_score = float(power_factor * env_factor * distance_factor)
+            # Use estimated reliability from optimization if available
+            if 'estimated_reliability' in recommendations:
+                recommendations['expected_reliability'] = float(recommendations['estimated_reliability'])
+            else:
+                recommendations['expected_reliability'] = min(1.0, max(0.5, confidence_score))
+
+        # Incorporate risk assessment if available
+        if 'risk_assessment' in recommendations and 'error' not in recommendations['risk_assessment']:
+            risk_factor = 1.0 - recommendations['risk_assessment']['overall_risk_score']
+            availability_factor = recommendations['risk_assessment']['expected_availability']
+            confidence_score = float(confidence_score * risk_factor * availability_factor)
+
         confidence_score = max(0.1, min(1.0, confidence_score))  # Clamp between 10% and 100%
-
-        recommendations['expected_reliability'] = min(1.0, max(0.5, confidence_score))
         
         logger.info(f"Optimization {optimization_id} completed")
         
@@ -673,10 +752,10 @@ async def train_models_background(task_id: str,
         import pandas as pd
         training_data = pd.read_csv(dataset_file)
         
-        # Train models
+        # Train models including neural networks
         results = manager.train_power_predictor(
             training_data,
-            model_types=["xgboost", "random_forest"]
+            model_types=["neural_network", "xgboost", "random_forest"]
         )
         
         logger.info(f"Model training task {task_id} completed")

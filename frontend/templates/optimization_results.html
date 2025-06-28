@@ -5,95 +5,251 @@
 {% block content %}
 <div class="content-area">
     {% if result.success %}
-        <!-- Confidence Score -->
+        <!-- Enhanced Confidence Score with AI Insights -->
         <div class="card mb-6">
             <div class="card-header">
-                <h3 class="card-title">Optimization Confidence</h3>
+                <h3 class="card-title">
+                    <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                    AI-Powered Optimization Confidence
+                </h3>
             </div>
-            <div class="progress-label">
-                <span>{{ "%.0f"|format(result.confidence_score * 100) }}%</span>
-            </div>
-            <div class="progress">
-                <div class="progress-bar" style="width: {{ result.confidence_score * 100 }}%;"></div>
+            <div class="grid grid-cols-3 gap-4 mb-4">
+                <div style="text-align: center;">
+                    <div class="progress-label">
+                        <span>{{ "%.0f"|format(result.confidence_score * 100) }}%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: {{ result.confidence_score * 100 }}%;"></div>
+                    </div>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem;">Overall Confidence</div>
+                </div>
+                {% if result.recommendations.get('risk_assessment') %}
+                <div style="text-align: center;">
+                    <div class="progress-label">
+                        <span>{{ "%.0f"|format((1 - result.recommendations.risk_assessment.overall_risk_score) * 100) }}%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: {{ (1 - result.recommendations.risk_assessment.overall_risk_score) * 100 }}%; background-color: #10b981;"></div>
+                    </div>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem;">Risk Score</div>
+                </div>
+                <div style="text-align: center;">
+                    <div class="progress-label">
+                        <span>{{ "%.0f"|format(result.recommendations.risk_assessment.expected_availability * 100) }}%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: {{ result.recommendations.risk_assessment.expected_availability * 100 }}%; background-color: #3b82f6;"></div>
+                    </div>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem;">Expected Availability</div>
+                </div>
+                {% else %}
+                <div style="text-align: center;">
+                    <div style="font-size: 1.5rem; color: var(--text-muted);">🧠</div>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary);">Neural Network</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 1.5rem; color: var(--text-muted);">⚡</div>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary);">AI-Optimized</div>
+                </div>
+                {% endif %}
             </div>
             <div class="progress-description">
                 {% if result.confidence_score >= 0.8 %}
-                    High Confidence - Recommended configuration should perform well
+                    🎯 <strong>High Confidence</strong> - Recommended configuration should perform excellently
                 {% elif result.confidence_score >= 0.5 %}
-                    Moderate Confidence - Consider additional analysis
+                    ⚠️ <strong>Moderate Confidence</strong> - Consider additional analysis or risk mitigation
                 {% else %}
-                    Low Confidence - Challenging conditions, proceed with caution
+                    🚨 <strong>Low Confidence</strong> - Challenging conditions detected, implement comprehensive risk mitigation
+                {% endif %}
+                {% if result.recommendations.get('prediction_uncertainty_db') %}
+                    <br><small>Prediction uncertainty: ±{{ "%.1f"|format(result.recommendations.prediction_uncertainty_db) }} dB</small>
                 {% endif %}
             </div>
         </div>
 
-        <!-- Recommended Configuration and Expected Performance -->
-        <div class="grid grid-cols-2 gap-6 mb-6">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
-                        Recommended Configuration
-                    </h3>
+        <!-- Risk Assessment Section -->
+        {% if result.recommendations.get('risk_assessment') %}
+        <div class="card mb-6">
+            <div class="card-header">
+                <h3 class="card-title">
                     <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                     </svg>
+                    Comprehensive Risk Assessment
+                </h3>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <!-- Overall Risk -->
+                <div style="text-align: center; padding: 1rem; background: {% if result.recommendations.risk_assessment.overall_risk_level == 'low' %}#ecfdf5{% elif result.recommendations.risk_assessment.overall_risk_level == 'medium' %}#fffbeb{% elif result.recommendations.risk_assessment.overall_risk_level == 'high' %}#fef2f2{% else %}#fdf2f8{% endif %}; border-radius: var(--radius-md);">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">
+                        {% if result.recommendations.risk_assessment.overall_risk_level == 'low' %}✅
+                        {% elif result.recommendations.risk_assessment.overall_risk_level == 'medium' %}⚠️
+                        {% elif result.recommendations.risk_assessment.overall_risk_level == 'high' %}🚨
+                        {% else %}💀{% endif %}
+                    </div>
+                    <div style="font-weight: 600; margin-bottom: 0.25rem; text-transform: capitalize;">{{ result.recommendations.risk_assessment.overall_risk_level }} Risk</div>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary);">Overall Assessment</div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div style="background: #f3f4f6; padding: 1rem; border-radius: var(--radius-md); text-align: center;">
-                        <div style="font-size: 1.5rem; font-weight: 500; margin-bottom: 0.25rem;">Transmitter</div>
-                        <div style="font-size: 2rem; font-weight: 600; margin-bottom: 0.5rem;">{{ "%.1f"|format(result.recommendations.get('tx_height_m', 0)) }}</div>
-                        <div style="font-size: 0.875rem; color: var(--text-secondary);">Tx Height</div>
-                        <div style="margin-top: 1rem; font-weight: 500;">{{ (result.recommendations.get('tx_material', 'concrete')|title|replace('_', ' ')) }}</div>
-                        <div style="font-size: 0.875rem; color: var(--text-secondary);">Tx Material</div>
-                    </div>
-                    <div style="background: #f3f4f6; padding: 1rem; border-radius: var(--radius-md); text-align: center;">
-                        <div style="font-size: 1.5rem; font-weight: 500; margin-bottom: 0.25rem;">Receiver</div>
-                        <div style="font-size: 2rem; font-weight: 600; margin-bottom: 0.5rem;">{{ "%.1f"|format(result.recommendations.get('rx_height_m', 0)) }}</div>
-                        <div style="font-size: 0.875rem; color: var(--text-secondary);">Rx Height</div>
-                        <div style="margin-top: 1rem; font-weight: 500;">{{ (result.recommendations.get('rx_material', 'concrete')|title|replace('_', ' ')) }}</div>
-                        <div style="font-size: 0.875rem; color: var(--text-secondary);">Rx Material</div>
-                    </div>
+                <!-- Weather Risk -->
+                <div style="text-align: center; padding: 1rem; background: {% if result.recommendations.risk_assessment.weather_risk_level == 'low' %}#ecfdf5{% elif result.recommendations.risk_assessment.weather_risk_level == 'medium' %}#fffbeb{% elif result.recommendations.risk_assessment.weather_risk_level == 'high' %}#fef2f2{% else %}#fdf2f8{% endif %}; border-radius: var(--radius-md);">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🌦️</div>
+                    <div style="font-weight: 600; margin-bottom: 0.25rem; text-transform: capitalize;">{{ result.recommendations.risk_assessment.weather_risk_level }} Weather Risk</div>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary);">{{ "%.0f"|format(result.recommendations.risk_assessment.weather_risk_score * 100) }}% Risk Score</div>
+                </div>
+
+                <!-- Equipment Risk -->
+                <div style="text-align: center; padding: 1rem; background: {% if result.recommendations.risk_assessment.equipment_reliability_score >= 0.8 %}#ecfdf5{% elif result.recommendations.risk_assessment.equipment_reliability_score >= 0.6 %}#fffbeb{% elif result.recommendations.risk_assessment.equipment_reliability_score >= 0.4 %}#fef2f2{% else %}#fdf2f8{% endif %}; border-radius: var(--radius-md);">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">⚙️</div>
+                    <div style="font-weight: 600; margin-bottom: 0.25rem;">Equipment Reliability</div>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary);">{{ "%.0f"|format(result.recommendations.risk_assessment.equipment_reliability_score * 100) }}% Reliability</div>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                        </svg>
-                        Expected Performance
-                    </h3>
-                    <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                    </svg>
+            <!-- Risk Details -->
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <h4 style="font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">🔧 Equipment Analysis</h4>
+                    <div style="background: #f9fafb; padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span>MTBF (Mean Time Between Failures)</span>
+                            <strong>{{ "%.0f"|format(result.recommendations.risk_assessment.mtbf_hours) }} hours</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span>Annual Failure Rate</span>
+                            <strong>{{ "%.2f"|format(result.recommendations.risk_assessment.annual_failure_rate) }} failures/year</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Maintenance Interval</span>
+                            <strong>{{ result.recommendations.risk_assessment.maintenance_interval_months }} months</strong>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div style="background: #f3f4f6; padding: 1rem; border-radius: var(--radius-md);">
-                        <div style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem;">{{ "%.1f"|format(result.recommendations.get('expected_rx_power_dbm', -50)) }}</div>
-                        <div style="font-size: 0.875rem; color: var(--text-secondary);">Rx Power (dBm)</div>
-                    </div>
-                    <div style="background: #f3f4f6; padding: 1rem; border-radius: var(--radius-md);">
-                        <div style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem;">{{ "%.1f"|format(result.recommendations.get('link_margin_db', 0)) }}</div>
-                        <div style="font-size: 0.875rem; color: var(--text-secondary);">Link Margin (dB)</div>
-                    </div>
-                    <div style="background: #f3f4f6; padding: 1rem; border-radius: var(--radius-md);">
-                        <div style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem;">{{ "%.1f"|format(result.recommendations.get('expected_reliability', 0.5) * 100) }}%</div>
-                        <div style="font-size: 0.875rem; color: var(--text-secondary);">Reliability</div>
-                    </div>
-                    <div style="background: #f3f4f6; padding: 1rem; border-radius: var(--radius-md);">
-                        <div style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem;">{{ "%.0f"|format(result.recommendations.get('optimization_score', 0)) }}%</div>
-                        <div style="font-size: 0.875rem; color: var(--text-secondary);">Optimization Score</div>
+                <div>
+                    <h4 style="font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">📊 Performance Metrics</h4>
+                    <div style="background: #f9fafb; padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span>Expected Availability</span>
+                            <strong>{{ "%.1f"|format(result.recommendations.risk_assessment.expected_availability * 100) }}%</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span>System Reliability</span>
+                            <strong>{{ "%.1f"|format(result.recommendations.risk_assessment.equipment_reliability_score * 100) }}%</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Risk Level</span>
+                            <strong style="text-transform: capitalize;">{{ result.recommendations.risk_assessment.overall_risk_level }}</strong>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        {% endif %}
+
+        <!-- Recommended Configuration -->
+        <div class="card mb-6">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    Recommended Configuration
+                </h3>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6 max-w-4xl mx-auto">
+                <div style="background: #f3f4f6; padding: 2rem; border-radius: var(--radius-md); text-align: center;">
+                    <div style="font-size: 1.5rem; font-weight: 500; margin-bottom: 0.5rem;">Transmitter</div>
+                    <div style="font-size: 3rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">{{ "%.1f"|format(result.recommendations.get('tx_height_m', 0)) }}m</div>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.5rem;">Height</div>
+                    <div style="font-weight: 600; font-size: 1.125rem; color: var(--text-primary);">{{ (result.recommendations.get('tx_material', 'concrete')|title|replace('_', ' ')) }}</div>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary);">Material</div>
+                </div>
+                <div style="background: #f3f4f6; padding: 2rem; border-radius: var(--radius-md); text-align: center;">
+                    <div style="font-size: 1.5rem; font-weight: 500; margin-bottom: 0.5rem;">Receiver</div>
+                    <div style="font-size: 3rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">{{ "%.1f"|format(result.recommendations.get('rx_height_m', 0)) }}m</div>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.5rem;">Height</div>
+                    <div style="font-weight: 600; font-size: 1.125rem; color: var(--text-primary);">{{ (result.recommendations.get('rx_material', 'concrete')|title|replace('_', ' ')) }}</div>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary);">Material</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Risk Factors -->
+        {% if result.recommendations.get('risk_assessment') and result.recommendations.risk_assessment.risk_factors %}
+        <div class="card mb-6">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    Risk Analysis
+                </h3>
+            </div>
+
+            <div style="padding: 1.5rem;">
+                <div style="margin-bottom: 1.5rem;">
+                    <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">Identified Risk Factors</h4>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+                        {% for factor in result.recommendations.risk_assessment.risk_factors %}
+                        <span style="display: inline-block; background: #fef3c7; color: #92400e; padding: 0.5rem 1rem; border-radius: var(--radius-md); font-size: 0.875rem; font-weight: 500; border: 1px solid #fbbf24;">{{ factor }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div style="background: #f9fafb; padding: 1.5rem; border-radius: var(--radius-md); border-left: 4px solid #f59e0b;">
+                    <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                        <svg style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; color: #f59e0b;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h5 style="font-weight: 600; color: var(--text-primary); margin: 0;">Risk Assessment Summary</h5>
+                    </div>
+
+                    <!-- Primary Risk Metrics -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="background: white; padding: 1rem; border-radius: var(--radius-md); border: 1px solid #e5e7eb;">
+                            <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Overall Risk Level</div>
+                            <div style="font-weight: 600; text-transform: capitalize; color: var(--text-primary); font-size: 1.125rem;">{{ result.recommendations.risk_assessment.overall_risk_level }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">Risk Score: {{ "%.1f"|format(result.recommendations.risk_assessment.overall_risk_score * 100) }}%</div>
+                        </div>
+                        <div style="background: white; padding: 1rem; border-radius: var(--radius-md); border: 1px solid #e5e7eb;">
+                            <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Weather Risk</div>
+                            <div style="font-weight: 600; text-transform: capitalize; color: var(--text-primary); font-size: 1.125rem;">{{ result.recommendations.risk_assessment.weather_risk_level }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">Score: {{ "%.1f"|format(result.recommendations.risk_assessment.weather_risk_score * 100) }}%</div>
+                        </div>
+                        <div style="background: white; padding: 1rem; border-radius: var(--radius-md); border: 1px solid #e5e7eb;">
+                            <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Equipment Reliability</div>
+                            <div style="font-weight: 600; color: var(--text-primary); font-size: 1.125rem;">{{ "%.1f"|format(result.recommendations.risk_assessment.equipment_reliability_score * 100) }}%</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">MTBF: {{ "%.0f"|format(result.recommendations.risk_assessment.mtbf_hours) }} hours</div>
+                        </div>
+                        <div style="background: white; padding: 1rem; border-radius: var(--radius-md); border: 1px solid #e5e7eb;">
+                            <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Expected Availability</div>
+                            <div style="font-weight: 600; color: var(--text-primary); font-size: 1.125rem;">{{ "%.1f"|format(result.recommendations.risk_assessment.expected_availability * 100) }}%</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">Annual Failure Rate: {{ "%.2f"|format(result.recommendations.risk_assessment.annual_failure_rate) }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Maintenance Information -->
+                    <div style="background: white; padding: 1rem; border-radius: var(--radius-md); border: 1px solid #e5e7eb;">
+                        <div style="display: flex; align-items: center; margin-bottom: 0.75rem;">
+                            <svg style="width: 1rem; height: 1rem; margin-right: 0.5rem; color: #6b7280;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <h6 style="font-weight: 600; color: var(--text-primary); margin: 0; font-size: 0.875rem;">Maintenance Schedule</h6>
+                        </div>
+                        <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                            Recommended maintenance interval: <strong style="color: var(--text-primary);">{{ result.recommendations.risk_assessment.maintenance_interval_months }} months</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
 
         <!-- Actions -->
         <div class="flex justify-between">

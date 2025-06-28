@@ -252,27 +252,45 @@ class FSocSimulationEngine:
         
         return pd.DataFrame(results)
     
-    def _generate_parameter_combinations(self, 
+    def _generate_parameter_combinations(self,
                                        parameter_ranges: Dict[str, List],
                                        max_samples: int) -> List[Dict]:
         """Generate parameter combinations for batch simulation."""
-        from itertools import product
-        
+        import random
+
         # Get all parameter names and values
         param_names = list(parameter_ranges.keys())
         param_values = list(parameter_ranges.values())
-        
-        # Generate all combinations
-        all_combinations = list(product(*param_values))
-        
-        # Limit to max_samples
-        if len(all_combinations) > max_samples:
-            # Random sampling
-            import random
-            selected_indices = random.sample(range(len(all_combinations)), max_samples)
-            selected_combinations = [all_combinations[i] for i in selected_indices]
+
+        # Calculate total possible combinations
+        total_combinations = 1
+        for values in param_values:
+            total_combinations *= len(values)
+
+        print(f"Total possible combinations: {total_combinations:,}")
+
+        # If total combinations is too large, use random sampling instead of full grid
+        if total_combinations > max_samples * 10:  # Use random sampling if much larger than needed
+            print(f"Using random sampling to generate {max_samples} combinations...")
+            selected_combinations = []
+
+            for _ in range(max_samples):
+                combination = []
+                for values in param_values:
+                    combination.append(random.choice(values))
+                selected_combinations.append(combination)
         else:
-            selected_combinations = all_combinations
+            # Generate all combinations and sample if needed
+            from itertools import product
+            all_combinations = list(product(*param_values))
+
+            # Limit to max_samples
+            if len(all_combinations) > max_samples:
+                # Random sampling
+                selected_indices = random.sample(range(len(all_combinations)), max_samples)
+                selected_combinations = [all_combinations[i] for i in selected_indices]
+            else:
+                selected_combinations = all_combinations
         
         # Convert to list of dictionaries
         return [
@@ -344,32 +362,50 @@ class FSocSimulationEngine:
 
 # Utility functions for common simulation tasks
 def create_training_dataset(output_dir: str = "backend/data",
-                          num_samples: int = 1000) -> str:
+                          num_samples: int = 1000,
+                          enhanced: bool = True) -> str:
     """
     Create a comprehensive training dataset for ML models.
-    
+
     Args:
         output_dir: Directory to save dataset
         num_samples: Number of samples to generate
-        
+        enhanced: Whether to use enhanced parameter ranges for better diversity
+
     Returns:
         Path to saved dataset file
     """
     engine = FSocSimulationEngine()
-    
-    # Define parameter ranges for diverse dataset
-    parameter_ranges = {
-        "height_tx": [5, 10, 15, 20, 30, 40, 50, 75, 100],
-        "height_rx": [5, 10, 15, 20, 30, 40, 50, 75, 100],
-        "material_tx": [m.value for m in MaterialType],
-        "material_rx": [m.value for m in MaterialType],
-        "fog_density": [0.0, 0.1, 0.2, 0.5, 1.0, 2.0, 3.0],
-        "rain_rate": [0.0, 0.5, 1.0, 2.0, 5.0, 10.0, 20.0, 50.0],
-        "surface_temp": [0, 10, 20, 25, 30, 35, 40, 50],
-        "ambient_temp": [0, 10, 15, 20, 25, 30, 35, 40],
-        "wavelength_nm": [850, 1310, 1550],
-        "tx_power_dbm": [10, 15, 20, 25, 30]
-    }
+
+    if enhanced and num_samples >= 5000:
+        # Enhanced parameter ranges for better model training (reduced for memory efficiency)
+        parameter_ranges = {
+            "height_tx": [5, 10, 15, 20, 25, 30, 40, 50, 75, 100],
+            "height_rx": [5, 10, 15, 20, 25, 30, 40, 50, 75, 100],
+            "material_tx": [m.value for m in MaterialType],
+            "material_rx": [m.value for m in MaterialType],
+            # More diverse weather conditions including extreme scenarios
+            "fog_density": [0.0, 0.1, 0.2, 0.5, 1.0, 2.0, 3.0, 5.0],
+            "rain_rate": [0.0, 0.5, 1.0, 2.0, 5.0, 10.0, 20.0, 50.0],
+            "surface_temp": [0, 10, 20, 25, 30, 35, 40, 50],
+            "ambient_temp": [0, 10, 15, 20, 25, 30, 35, 40],
+            "wavelength_nm": [850, 1310, 1550],
+            "tx_power_dbm": [10, 15, 20, 25, 30]
+        }
+    else:
+        # Original parameter ranges for smaller datasets
+        parameter_ranges = {
+            "height_tx": [5, 10, 15, 20, 30, 40, 50, 75, 100],
+            "height_rx": [5, 10, 15, 20, 30, 40, 50, 75, 100],
+            "material_tx": [m.value for m in MaterialType],
+            "material_rx": [m.value for m in MaterialType],
+            "fog_density": [0.0, 0.1, 0.2, 0.5, 1.0, 2.0, 3.0],
+            "rain_rate": [0.0, 0.5, 1.0, 2.0, 5.0, 10.0, 20.0, 50.0],
+            "surface_temp": [0, 10, 20, 25, 30, 35, 40, 50],
+            "ambient_temp": [0, 10, 15, 20, 25, 30, 35, 40],
+            "wavelength_nm": [850, 1310, 1550],
+            "tx_power_dbm": [10, 15, 20, 25, 30]
+        }
     
     # Base configuration (San Francisco area)
     base_config = EnvironmentInput(

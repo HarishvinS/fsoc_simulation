@@ -2,13 +2,40 @@
 
 {% block title %}Optimize Deployment - LightLink{% endblock %}
 
+{% block head %}
+<style>
+    /* Additional responsive padding for optimize page */
+    @media (min-width: 1024px) {
+        .optimize-content {
+            padding-left: 4rem !important;
+            padding-right: 4rem !important;
+        }
+    }
+
+    @media (min-width: 1440px) {
+        .optimize-content {
+            padding-left: 6rem !important;
+            padding-right: 6rem !important;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .optimize-content {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="content-area">
-    <h1 style="font-size: 2rem; font-weight: 400; margin-bottom: 0.5rem; color: var(--text-primary);">Optimize a deployment using ML.</h1>
+<div class="content-area optimize-content" style="padding: 2rem; max-width: 1200px; margin: 0 auto; padding-left: 3rem; padding-right: 3rem;">
+    <h1 style="font-size: 2rem; font-weight: 400; margin-bottom: 1.5rem; color: var(--text-primary);">Optimize Deployments using ML</h1>
+
 
     <form method="POST" action="/optimize" id="optimizationForm">
         <!-- Location Configuration -->
-        <div class="grid grid-cols-2 gap-6 mb-6">
+        <div class="grid grid-cols-2 gap-8 mb-8">
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">
@@ -55,7 +82,7 @@
         </div>
 
         <!-- Environmental Conditions -->
-        <div class="card mb-6">
+        <div class="card mb-8">
             <div class="card-header">
                 <h3 class="card-title">
                     <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -86,7 +113,7 @@
         </div>
 
         <!-- Constraints -->
-        <div class="grid grid-cols-2 gap-6 mb-6">
+        <div class="grid grid-cols-2 gap-8 mb-8">
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">
@@ -138,7 +165,7 @@
         </div>
 
         <!-- Available Materials -->
-        <div class="card mb-6">
+        <div class="card mb-8">
             <div class="card-header">
                 <h3 class="card-title">
                     <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -177,7 +204,7 @@
         </div>
 
         <!-- Actions -->
-        <div class="flex justify-between">
+        <div class="flex justify-between" style="margin-top: 2rem;">
             <button type="reset" class="btn btn-secondary">Reset everything</button>
             <button type="submit" class="btn btn-primary" id="optimizeBtn">Run Optimization</button>
         </div>

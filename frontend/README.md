@@ -34,8 +34,8 @@ This is a Flask-based frontend for the FSOC Link Optimization system. It provide
 ## Pages
 
 - **Home**: Navigation to different features
-- **Simulate Link**: Run simulations with custom parameters
-
+- **Simulate Link**: Run detailed FSOC link simulations with environmental parameters
+- **AI-Powered Optimization**: Advanced neural network optimization with uncertainty quantification and comprehensive risk assessment
 - **System Health**: Check the status of the backend API and model availability
 - **Examples**: Pre-configured example simulations
 

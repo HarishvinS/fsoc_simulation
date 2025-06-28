@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 # Configuration - Use environment variables for production
-API_BASE_URL = os.environ.get("API_BASE_URL", "http://localhost:8002")
+API_BASE_URL = os.environ.get("API_BASE_URL", "http://localhost:8001")
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
 
 # Check backend connection on startup

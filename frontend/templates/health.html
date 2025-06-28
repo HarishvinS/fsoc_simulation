@@ -130,7 +130,7 @@
                 Feature Availability
             </h3>
         </div>
-        <div class="grid grid-cols-3 gap-4">
+        <div class="grid grid-cols-4 gap-4">
             <div class="text-center">
                 <div style="font-size: 3rem; margin-bottom: 1rem;">📡</div>
                 <h5>Link Simulation</h5>
@@ -149,6 +149,22 @@
                 {% else %}
                     <span class="badge badge-danger">Unavailable</span>
                 {% endif %}
+            </div>
+
+            <div class="text-center">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🧠</div>
+                <h5>AI Optimization</h5>
+                {% if health.models_loaded.power_predictors %}
+                    <span class="badge badge-success">Neural Networks Ready</span>
+                {% else %}
+                    <span class="badge badge-warning">Training Required</span>
+                {% endif %}
+            </div>
+
+            <div class="text-center">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+                <h5>Risk Assessment</h5>
+                <span class="badge badge-success">Enhanced Analytics</span>
             </div>
         </div>
     </div>
