@@ -201,5 +201,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Acknowledgments
 
-- Project created by [Harishvin Sasikumar](https://harishvin.framer.website/)
-MIT License
+Project created by [Harishvin Sasikumar](https://harishvin.framer.website/)
