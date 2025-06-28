@@ -170,31 +170,7 @@
             </svg>
             New Simulation
         </a>
-        <form method="GET" action="/optimize" style="display: inline;">
-            <input type="hidden" name="lat_tx" value="{{ result.get('results', {}).get('input_parameters', {}).get('lat_tx', 37.7749) }}">
-            <input type="hidden" name="lon_tx" value="{{ result.get('results', {}).get('input_parameters', {}).get('lon_tx', -122.4194) }}">
-            <input type="hidden" name="lat_rx" value="{{ result.get('results', {}).get('input_parameters', {}).get('lat_rx', 37.7849) }}">
-            <input type="hidden" name="lon_rx" value="{{ result.get('results', {}).get('input_parameters', {}).get('lon_rx', -122.4094) }}">
-            {% if result.get('results', {}).get('weather_info') %}
-            <!-- Use real weather data if available -->
-            <input type="hidden" name="avg_fog_density" value="{{ result.get('results', {}).get('weather_info', {}).get('fog_density_g_m3', 0.1) }}">
-            <input type="hidden" name="avg_rain_rate" value="{{ result.get('results', {}).get('weather_info', {}).get('rain_rate_mm_hr', 2.0) }}">
-            <input type="hidden" name="avg_surface_temp" value="{{ result.get('results', {}).get('weather_info', {}).get('ambient_temp_c', 25) }}">
-            <input type="hidden" name="avg_ambient_temp" value="{{ result.get('results', {}).get('weather_info', {}).get('ambient_temp_c', 20) }}">
-            {% else %}
-            <!-- Use manual input values -->
-            <input type="hidden" name="avg_fog_density" value="{{ result.get('results', {}).get('input_parameters', {}).get('fog_density', 0.1) }}">
-            <input type="hidden" name="avg_rain_rate" value="{{ result.get('results', {}).get('input_parameters', {}).get('rain_rate', 2.0) }}">
-            <input type="hidden" name="avg_surface_temp" value="{{ result.get('results', {}).get('input_parameters', {}).get('surface_temp', 25) }}">
-            <input type="hidden" name="avg_ambient_temp" value="{{ result.get('results', {}).get('input_parameters', {}).get('ambient_temp', 20) }}">
-            {% endif %}
-            <button type="submit" class="btn btn-primary">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path>
-                </svg>
-                Optimize This Link
-            </button>
-        </form>
+
     </div>
 
     {% else %}

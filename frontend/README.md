@@ -35,7 +35,7 @@ This is a Flask-based frontend for the FSOC Link Optimization system. It provide
 
 - **Home**: Navigation to different features
 - **Simulate Link**: Run simulations with custom parameters
-- **Optimize Deployment**: Get recommendations for optimal deployment parameters
+
 - **System Health**: Check the status of the backend API and model availability
 - **Examples**: Pre-configured example simulations
 
