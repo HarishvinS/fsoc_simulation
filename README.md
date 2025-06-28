@@ -2,6 +2,12 @@
 
 A comprehensive system for modeling and optimizing Free Space Optical Communication (FSOC) links under various atmospheric conditions.
 
+To run this app locally, clone this repository and run ```python start_app.py```. 
+
+Alternatively, you can also access it via a Render deployment. However, the instance is hosted on the free plan as of now, causing extensive delay. Running the application locally is recommended at this time. 
+
+Render deployment: https://fsoc-global.onrender.com
+
 ## Overview
 
 This system models real-world FSOC link degradation from:
@@ -74,7 +80,7 @@ pip install -r requirements.txt
 # Train prediction models (if needed)
 python train_models.py --train
 
-# Start the application (both backend and frontend)
+# Start the application
 python start_app.py
 
 # Alternatively, use the batch file on Windows
@@ -169,17 +175,13 @@ pytest
 pytest --cov=backend
 ```
 
-## Deployment
+## General Usage
 
-The system is ready for deployment on Render:
+Clone this repository and run ```python start_app.py```
 
-```bash
-# Push to GitHub
-git push origin main
 
-# Deploy using render.yaml configuration
-# See DEPLOYMENT.md for detailed instructions
-```
+The system is deployed via Render. Access it here: https://fsoc-global.onrender.com
+**This system is hosted using Render's free plan, so you may experience severe delays. Running the application locally is recommended.**
 
 ## Contributing
 
